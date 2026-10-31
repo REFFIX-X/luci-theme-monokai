@@ -50,11 +50,12 @@
 
 	.fs-search-opt {
 		display: flex; align-items: baseline; gap: var(--fs-space-2-5);
+		width: 100%; margin: 0; border: 0; background: transparent; font: inherit; text-align: start;
 		padding: var(--fs-space-2) var(--fs-space-2-5); border-radius: var(--fs-radius);
 		color: var(--fs-text); text-decoration: none; cursor: pointer;
 	}
 	/* one highlight for pointer AND keyboard: .active is set on both aria-activedescendant and pointermove, so mouse and arrow keys can never disagree which row Enter opens */
-	.fs-search-opt.active { background: var(--fs-accent-soft); color: var(--fs-accent); }
+	.fs-search-opt.active { background: color-mix(in srgb, var(--fs-purple) 14%, transparent); color: var(--fs-purple); }
 	.fs-search-opt-title { flex: 0 1 auto; font-weight: var(--fs-weight-bold); font-size: var(--fs-type); }
 	.fs-search-opt-path {
 		flex: 1 1 auto; min-width: 0;

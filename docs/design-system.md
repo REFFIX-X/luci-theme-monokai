@@ -85,8 +85,8 @@ which is what a hairline is for.
 
 ## Palettes
 
-Five, all in `styles/03-palettes.css`, one block per (palette × mode): **footstrap** (GitHub Primer
-colours, the default, filling a bare `:root`), **hicontrast** (`data-palette="hicontrast"`),
+Five, all in `styles/03-palettes.css`, one block per (palette × mode): **footstrap** (REFFIX
+Monokai Pro, the default, filling a bare `:root`; light is the same hues darkened to AA), **hicontrast** (`data-palette="hicontrast"`),
 **bootstrap** (`data-palette="bootstrap"`, the stock LuCI theme's surfaces and greys), **2020**
 (`data-palette="2020"`, the OpenWrt 2020 theme's colourway) and **forum**
 (`data-palette="forum"`, the OpenWrt forum's Discourse colourway). Light mode is the bare `:root`;

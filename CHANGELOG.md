@@ -1,5 +1,24 @@
 ## [Unreleased]
 
+### Added
+
+- **In-place navigation asks before it leaves a form that still has unsaved field edits.** `pushState` does not fire `beforeunload`, so a menu click used to discard a half-edited page. The first activation announces the leave in the route status and stays; the next activation within 4 seconds proceeds, including a page that can only be opened with a full load. Back and Forward are undone with `history.go()` so the stack does not gain a duplicate entry.
+- **The command palette runs three chrome actions besides page search.** With the palette empty, or when the query matches, it can switch between light and dark, collapse or expand the sidebar, and open LuCI's pending-changes control when that indicator is on screen.
+- **Opening a page warms the other tabs of that same page while the browser is idle.** At most six sibling views are fetched, the current page is skipped, and `saveData` turns the warmer off. Hover prefetch is unchanged.
+- **An appearance change in one tab is applied in the other open tabs.** Layout, theme, density, auto-collapse and the sidebar rail update from the `storage` event. Colour axes update the same way once the axes module has loaded. The other tab paints the stored value and does not write it back, so a reset in one tab is not undone by the other.
+
+### Changed
+
+- **The default light palette is Monokai Pro, darkened until each hue clears WCAG AA and the export ramp stays a ramp.** Light surfaces are warm paper (`#F7F4F1` / `#FFFCFA` / `#EFEAE6`) with the dark page colour `#2D2A2E` as ink. Accent `#147672`, good `#51741b`, warning `#85650c` and danger `#af435e` clear at least 4.55:1 on the lightest surface, and white ink on those fills is at least 5.43:1. The splash `theme-color` and the manifest use `#f7f4f1`.
+- **Orange and purple are used.** Pending configuration changes use orange (`#FC9867` in the dark, 6.63:1 on `#2D2A2E`). The active command-palette row uses purple (`#AB9DF2` in the dark, 5.96:1 on `#2D2A2E`). Other palettes fall back to warning and accent.
+- **Save and Apply stay at the bottom of the scroller on a long form.** The page-action bar is `position: sticky` with an opaque page background, so the row remains reachable while the map is scrolled. Print still hides the bar.
+- **The installer verifies the APK with `sha256sum` or `openssl`, and its fallback release is v2.0.2.** A router image without `sha256sum` used to stop before the download. The manual install steps now compare the checksum before `apk add`.
+- **Repository text is English only.** The Russian README, changelog mirror and styling-guide translation are removed. LuCI language catalogues in `po/` are unchanged.
+
+### Fixed
+
+- **A node inserted with `before()`, `after()` or `replaceWith()` on a direct child of `<body>` is recorded.** The body-instance wrap cannot see those methods. The page realm's `Element.prototype` records the new element only when its parent is `<body>`, which is the same litter check the router already uses to fall back to a full load.
+
 ## [2.0.2] — 2026-10-12
 
 ### Changed

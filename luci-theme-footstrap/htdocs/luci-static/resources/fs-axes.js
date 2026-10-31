@@ -375,6 +375,37 @@ function resetToSaved() {
  * stamps :root as usual. Stated rather than derived: a default is a default because it is what a
  * bare :root paints, and the five with a named const use it, so the numbers cannot drift from the
  * CSS. */
+/* Another tab changed an axis this module owns. Re-apply from storage; the value is already
+ * there when the event fires. Layout, theme, density and the rail are applied by fs-prefs.js
+ * on every page, including before this module has loaded. */
+function reapplyStored() {
+	PALETTE.apply(PALETTE.current());
+	WALLPAPER.apply(WALLPAPER.current());
+	TINT.apply(TINT.current());
+	ACCENT.apply(ACCENT.current());
+	GOOD.apply(GOOD.current());
+	WARN.apply(WARN.current());
+	DANGER.apply(DANGER.current());
+	CARD.apply(CARD.current());
+	CONTROL.apply(CONTROL.current());
+	BAR.apply(BAR.current());
+	LINE.apply(LINE.current());
+	RADIUS.apply(RADIUS.current());
+	TSTR.apply(TSTR.current());
+	PDIM.apply(PDIM.current());
+	PSIZE.apply(PSIZE.current());
+	PSTR.apply(PSTR.current());
+	PINK.apply(PINK.current());
+	CWIDTH.apply(CWIDTH.current());
+}
+window.addEventListener('storage', (ev) => {
+	if (!ev.key || ev.key.indexOf('fs-') !== 0) return;
+	if (ev.key === 'fs-recent' || ev.key === 'fs-menu-open' || ev.key === 'fs-rail' ||
+	    ev.key === 'fs-darkmode' || ev.key === 'fs-layout' || ev.key === 'fs-density' ||
+	    ev.key === 'fs-menu-autocollapse') return;
+	prefs.paintFromStorage(reapplyStored);
+});
+
 function resetToBuiltin() {
 	/* `top` for layout, not sidebar: the bar is what a bare :root paints (head.ut stamps it when uci
 	 * says nothing), so it is what "as the theme ships" means. The colour and surface axes reset to

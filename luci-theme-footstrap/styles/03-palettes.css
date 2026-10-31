@@ -18,6 +18,10 @@
 		--fs-good: var(--fs-good-base);
 		--fs-warn: var(--fs-warn-base);
 		--fs-danger: var(--fs-danger-base);
+		/* Orange and purple are palette hues, not a sixth status axis. Palettes that do not set
+		 * a base keep warning and accent, so the two call sites stay valid everywhere. */
+		--fs-orange: var(--fs-orange-base, var(--fs-warn-base));
+		--fs-purple: var(--fs-purple-base, var(--fs-accent-base));
 		/* deliberately under AA — the "nothing here" ink, held by `npm run placeholder`.
 		 * docs/design-system.md "The fourth ink is the one". */
 		--fs-placeholder-mix: 55%;
@@ -64,27 +68,32 @@
 	:root[data-warn="hex"][data-warn][data-warn]       { --fs-on-warn:   oklch(from var(--fs-warn)   clamp(0, (l - .62) * -100, 1) 0 0); }
 	:root[data-danger="hex"][data-danger][data-danger] { --fs-on-danger: oklch(from var(--fs-danger) clamp(0, (l - .62) * -100, 1) 0 0); }
 
-	/* ---- footstrap — GitHub Primer (DEFAULT, also fills bare :root) ---- */
+	/* ---- footstrap — REFFIX Monokai Pro (DEFAULT, also fills bare :root) ---- */
 	/* never matches (both appliers REMOVE it for the default) — kept so :root need not duplicate
 	 * the derive rule above */
 	:root,
 	:root[data-palette="footstrap"] {
-		/* LIGHT */
-		--fs-bg-base: #f6f8fa;
-		--fs-panel-base: #fff;
-		--fs-panel2-base: #f6f8fa;
-		--fs-border-base: #d0d7de;
-		--fs-text: #1f2328;
-		/* raised past AA — GitHub-light greys read as 5.2/4.9:1 on the card (page descriptions,
-		 * field titles), now 11.8/10.0:1 */
-		--fs-dim: #33383d;
-		--fs-faint: #3d4348;
-		--fs-accent-base: #0969da;
-		--fs-track: #eaeef2;
-		--fs-good-base: #197c36;
-		--fs-warn-base: #946300;
-		--fs-danger-base: #cf222e;
-		/* ink ON the fills above — white clears AA on all four: 5.19/5.28/5.19/5.36. --fs-panel-base
+		/* LIGHT — the dark Monokai hues taken down until each clears AA as text on the three
+		 * surfaces, as a fill under white ink, and the export ramp stays 0.10 apart
+		 * (tools/export-tier.mjs). A muted teal/olive sits on --fs-dim and the ramp goes flat.
+		 * Measured on #FFFCFA / #F7F4F1 / #EFEAE6: accent, good and warn 5.32/4.96/4.55,
+		 * danger 5.43/5.06/4.64. White ink 5.43/5.43/5.43/5.54.
+		 * Orange 5.47 and purple 5.38 are the same walk from #FC9867 and #AB9DF2. */
+		--fs-bg-base: #F7F4F1;
+		--fs-panel-base: #FFFCFA;
+		--fs-panel2-base: #EFEAE6;
+		--fs-border-base: #D4CCC6;
+		--fs-text: #2D2A2E;
+		--fs-dim: #5C565A;
+		--fs-faint: #6B6468;
+		--fs-accent-base: #147672;
+		--fs-track: #E7E0DA;
+		--fs-good-base: #51741b;
+		--fs-warn-base: #85650c;
+		--fs-danger-base: #af435e;
+		--fs-orange-base: #94593d;
+		--fs-purple-base: #6b6297;
+		/* ink ON the fills above — white clears AA on all four: 5.43/5.43/5.43/5.54. --fs-panel-base
 		 * and these four inks are the same #fff in every light palette below, so THIS is their
 		 * only definition — hicontrast/bootstrap/2020/forum's light blocks inherit them, unset.
 		 * docs/design-system.md "Adding a palette". */
@@ -114,6 +123,9 @@
 		--fs-on-good: #2D2A2E;
 		--fs-on-warn: #2D2A2E;
 		--fs-on-danger: #2D2A2E;
+		/* README hues, used as text: orange 6.63:1 and purple 5.96:1 on #2D2A2E. */
+		--fs-orange-base: #FC9867;
+		--fs-purple-base: #AB9DF2;
 	}
 
 	/* ---- hicontrast — deeper, more saturated (opt-in); docs/design-system.md "Palettes" ---- */

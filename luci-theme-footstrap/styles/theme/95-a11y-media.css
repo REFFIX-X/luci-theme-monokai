@@ -33,6 +33,10 @@
 			--fs-placeholder-mix: 62%;
 		}
 		:root[data-darkmode="true"] { --fs-placeholder-mix: 80%; }
+		/* Footstrap light ink is #2D2A2E on #EFEAE6. 62% measures 4.31:1 there; 70% clears 4.5
+		 * and stays above the 15% separation floor. Other light palettes already clear 62%. */
+		:root:not([data-palette]):not([data-darkmode="true"]),
+		:root[data-palette="footstrap"]:not([data-darkmode="true"]) { --fs-placeholder-mix: 70%; }
 	}
 
 	/* forced-colors: background-color is forced to the system canvas, so state carried by

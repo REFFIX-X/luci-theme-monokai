@@ -5,7 +5,7 @@ it ships no framework and depends on nothing but `luci-base`. Page content is re
 by app view-JS, so the theme is server chrome (`ucode/template/themes/footstrap/*.ut`) + one
 generated `cascade.css` + `fs-*.js` in `htdocs/luci-static/resources/`.
 
-**Communicate in Russian.** Code, comments, commit messages and PR text stay in English.
+**Communicate in English.** Code, comments, commit messages and PR text stay in English.
 
 **The floor is 24.10.** 23.05 support ended at 0.14.2 (`ui.RangeSlider` is 24.10-only,
 openwrt/luci#8978); `install.sh` serves a 23.05 router that pin. `docs/releasing.md`.

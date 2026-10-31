@@ -3,7 +3,7 @@
 set -eu
 
 REPO="REFFIX-X/luci-theme-footstrap"
-FALLBACK_VERSION="v2.0.0"
+FALLBACK_VERSION="v2.0.2"
 PACKAGE="reffix-luci-theme-footstrap-openwrt-25.12.apk"
 SUMS="SHA256SUMS-openwrt-25.12.txt"
 TMP="/tmp/reffix-theme-install.$$"
@@ -38,8 +38,16 @@ case "${DISTRIB_RELEASE:-}:${DISTRIB_TARGET:-}" in
     ;;
 esac
 
-command -v sha256sum >/dev/null 2>&1 || {
-  echo "ERROR: sha256sum is required to verify the release download." >&2
+hash_file() {
+  if command -v sha256sum >/dev/null 2>&1; then
+    sha256sum "$1" | awk '{ print $1 }'
+    return
+  fi
+  if command -v openssl >/dev/null 2>&1; then
+    openssl dgst -sha256 "$1" | awk '{ print $NF }'
+    return
+  fi
+  echo "ERROR: sha256sum or openssl is required to verify the release download." >&2
   exit 1
 }
 
@@ -64,7 +72,7 @@ else
 fi
 
 EXPECTED="$(awk -v f="$PACKAGE" '$2 == f { print $1; exit }' "$TMP/$SUMS")"
-ACTUAL="$(sha256sum "$TMP/$PACKAGE" | awk '{ print $1 }')"
+ACTUAL="$(hash_file "$TMP/$PACKAGE")"
 [ -n "$EXPECTED" ] || {
   echo "ERROR: the release checksum file does not name $PACKAGE." >&2
   exit 1
@@ -77,4 +85,5 @@ ACTUAL="$(sha256sum "$TMP/$PACKAGE" | awk '{ print $1 }')"
 echo "Checksum verified. Installing/upgrading REFFIX Monokai Pro..."
 apk add --allow-untrusted "$TMP/$PACKAGE"
 echo "Done. Open LuCI → System → System → Language and Style, then select Monokai Pro."
+echo "A design that is already set is left as it is. Monokai Pro is selected only when LuCI has no Design set."
 echo "Existing package identity luci-theme-footstrap is retained for in-place upgrades."

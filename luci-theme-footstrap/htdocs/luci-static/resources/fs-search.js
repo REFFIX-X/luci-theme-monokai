@@ -223,7 +223,7 @@ function build() {
 		if (warmT) window.clearTimeout(warmT);
 		warmT = window.setTimeout(() => {
 			warmT = null;
-			if (ents[at]) router.prefetchSegs(ents[at].segs);
+			if (ents[at] && ents[at].segs) router.prefetchSegs(ents[at].segs);
 		}, 200);
 	}
 
@@ -240,35 +240,79 @@ function build() {
 		warmActive();
 	}
 
+	/* Chrome actions sit in the same list as pages. A button, not a link: there is no URL, and
+	 * the click must not reach the router. Shown when the query is empty or every token hits
+	 * the title. */
+	function chromeActions(q) {
+		const mode = prefs.currentMode();
+		let osDark = false;
+		try { osDark = window.matchMedia('(prefers-color-scheme: dark)').matches; }
+		catch (e) { /* no matchMedia: an auto theme is treated as light */ }
+		const darkNow = mode === 'dark' || (mode === 'auto' && osDark);
+		const rail = prefs.currentRail();
+		const changes = document.querySelector('[data-indicator="uci-changes"][data-clickable]');
+		const all = [
+			{
+				title: darkNow ? _('Use light theme', 'footstrap') : _('Use dark theme', 'footstrap'),
+				run() { prefs.applyMode(darkNow ? 'light' : 'dark'); }
+			},
+			{
+				title: rail ? _('Expand sidebar', 'footstrap') : _('Collapse sidebar', 'footstrap'),
+				run() { prefs.applyRail(!rail); }
+			}
+		];
+		if (changes) all.push({
+			title: _('Show pending changes', 'footstrap'),
+			run() { changes.click(); }
+		});
+		if (!q) return all;
+		const toks = q.toLowerCase().split(/\s+/).filter(Boolean);
+		return all.filter((a) => toks.every((t) => a.title.toLowerCase().indexOf(t) >= 0));
+	}
+
 	function render(q) {
+		const actions = chromeActions(q);
 		const entries = q ? search(q, MAX_RESULTS) : recentEntries();
-		ents = entries;
+		ents = actions.concat(entries);
 		list.innerHTML = '';
-		opts = entries.map((e, i) => {
-			/* role="option" on the <a> itself: an option may not contain an interactive element,
-			 * and the anchor must stay a real link — it carries the click to the router and keeps
-			 * middle-click and "copy link" working */
-			const a = E('a', {
+		opts = ents.map((e, i) => {
+			const trail = e.segs
+				? (e.trail.length ? e.trail.join(' › ') : '')
+				: _('Action', 'footstrap');
+			/* role="option" on the control itself: an option may not contain an interactive
+			 * element. A page stays a real link so the click reaches the router and
+			 * middle-click / "copy link" keep working. An action is a button. */
+			const attrs = {
 				'class': 'fs-search-opt',
 				'role': 'option',
 				'id': 'fs-search-opt-' + i,
-				'aria-selected': 'false',
-				'href': L.url.apply(L, e.segs)
-			}, [
+				'aria-selected': 'false'
+			};
+			if (e.segs) attrs.href = L.url.apply(L, e.segs);
+			else attrs.type = 'button';
+			const a = E(e.segs ? 'a' : 'button', attrs, [
 				E('span', { 'class': 'fs-search-opt-title' }, [ e.title ]),
-				e.trail.length ? E('span', { 'class': 'fs-search-opt-path' }, [ e.trail.join(' › ') ]) : ''
+				trail ? E('span', { 'class': 'fs-search-opt-path' }, [ trail ]) : ''
 			]);
 			/* close before the click reaches the router, which re-renders the chrome underneath;
 			 * no focus return, the user is going elsewhere */
-			a.addEventListener('click', () => close(false));
+			a.addEventListener('click', () => {
+				close(false);
+				if (e.run) e.run();
+			});
 			a.addEventListener('pointermove', () => { if (at !== i) setActive(i); });
 			list.appendChild(a);
 			return a;
 		});
-		note.textContent = opts.length
-			? (q ? '' : _('Recently visited', 'footstrap'))
-			: (q ? _('No pages found', 'footstrap') : _('Start typing to find a page', 'footstrap'));
-		note.hidden = !note.textContent;
+		/* The note sits above the whole list. Actions carry their own "Action" trail, so a
+		 * "Recently visited" caption would describe the wrong rows once those actions lead. */
+		let caption = '';
+		if (!opts.length)
+			caption = q ? _('No pages found', 'footstrap') : _('Start typing to find a page', 'footstrap');
+		else if (!q && !actions.length)
+			caption = _('Recently visited', 'footstrap');
+		note.textContent = caption;
+		note.hidden = !caption;
 		setActive(0);
 	}
 

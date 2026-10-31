@@ -89,7 +89,6 @@
 
 	/* Save/Apply footer: base renders a tall half-empty plate with bottom-only radius, made a compact rounded bar */
 	.cbi-page-actions {
-		background: transparent;
 		border: 0;
 		border-radius: 0;
 		box-shadow: none;
@@ -105,6 +104,14 @@
 		 * of sharing it — docs/css.md "Buttons: the page-action bar wraps, not shrinks" has the
 		 * before/after numbers. */
 		flex-wrap: wrap;
+		/* The bar is the last row of a long map. Sticky keeps Save/Apply in the scroller
+		 * (.fs-main in the sidebar layout, the document in the top layout) until the row's
+		 * own place arrives. An opaque fill is required: a transparent bar paints the rows
+		 * scrolling underneath it. Print hides the whole bar (97-print.css). */
+		position: sticky;
+		bottom: 0;
+		z-index: var(--fs-z-sticky);
+		background: var(--fs-bg);
 	}
 	.cbi-page-actions .cbi-button,
 	.cbi-page-actions .btn {

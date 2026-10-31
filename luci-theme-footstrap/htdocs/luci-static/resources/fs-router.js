@@ -416,6 +416,10 @@ const _scrollMem = new Map();
 const _scrollSess = Date.now().toString(36) + Math.floor(Math.random() * 1e6).toString(36);
 let _histN = 0;
 let _curId = null;
+/* Monotonic history index stamped into history.state. A popstate compares it with _seq to tell
+ * Back from Forward when an unsaved form has to undo the move. */
+let _seq = 0;
+let _leaveHold = false;
 /* …and it is bounded, because this document outlives every page in it. A browser keeps ~50 entries
  * per tab and the ones past that cannot be traversed back to, so remembering more offsets can never
  * be read. Least-recently-saved goes first: a Map iterates in insertion order and `set` on an
@@ -430,9 +434,14 @@ function newEntryId() { return _scrollSess + ':' + (++_histN); }
  * carries state === null) */
 function adoptEntry() {
 	const st = history.state;
-	if (st && st.fsid) { _curId = st.fsid; return; }
+	if (st && st.fsid) {
+		_curId = st.fsid;
+		if (typeof st.fsseq === 'number') _seq = st.fsseq;
+		return;
+	}
 	_curId = newEntryId();
-	try { history.replaceState(Object.assign({}, st, { fsid: _curId }), '', window.location.href); } catch (e) {}
+	_seq = (st && typeof st.fsseq === 'number') ? st.fsseq : 0;
+	try { history.replaceState(Object.assign({}, st, { fsid: _curId, fsseq: _seq }), '', window.location.href); } catch (e) {}
 }
 
 /* the outgoing DOM is still on screen at both call sites (the click, the popstate), so this must
@@ -928,11 +937,84 @@ function progressEnd() {
 	}, 300);
 }
 
+/* A control whose current value is not the one the page rendered. Hidden, button and submit
+ * inputs are not edits. A select is dirty when any option's selected bit differs from the
+ * default the parser set. */
+function fieldDirty(el) {
+	if (!el || el.disabled) return false;
+	const tag = el.nodeName;
+	if (tag === 'INPUT') {
+		const t = String(el.type || '').toLowerCase();
+		if (t === 'hidden' || t === 'button' || t === 'submit' || t === 'reset' || t === 'image') return false;
+		if (t === 'checkbox' || t === 'radio') return el.checked !== el.defaultChecked;
+		return el.value !== el.defaultValue;
+	}
+	if (tag === 'TEXTAREA') return el.value !== el.defaultValue;
+	if (tag === 'SELECT' && el.options) {
+		for (let i = 0; i < el.options.length; i++)
+			if (el.options[i].selected !== el.options[i].defaultSelected) return true;
+	}
+	return false;
+}
+function viewDirty() {
+	const view = document.getElementById('view');
+	if (!view || !view.querySelectorAll) return false;
+	const nodes = view.querySelectorAll('input, textarea, select');
+	for (let i = 0; i < nodes.length; i++) if (fieldDirty(nodes[i])) return true;
+	return false;
+}
+/* Two activations, not window.confirm(): the first arms a 4 s window and says so in the route
+ * live region; the second within that window proceeds. pushState does not fire beforeunload, so
+ * a view that warned only there would lose the edit on a menu click. */
+const LEAVE_MS = 4000;
+let _leaveArm = 0;
+function leaveBlocked() {
+	if (!viewDirty()) { _leaveArm = 0; return false; }
+	const now = Date.now();
+	if (_leaveArm && (now - _leaveArm) < LEAVE_MS) { _leaveArm = 0; return false; }
+	_leaveArm = now;
+	const live = document.getElementById('fs-nav-status');
+	if (live) live.textContent = _('Unsaved changes. Open the link again to leave this page.', 'footstrap');
+	return true;
+}
+
+/* Idle-warm the other SPA tabs of the page just opened. Hover prefetch does not run when the
+ * next click is a tab the pointer never crossed. Capped, and off under saveData, same as the
+ * recent-page warmer. */
+function prefetchSiblings(segs) {
+	try { if (navigator.connection && navigator.connection.saveData) return; }
+	catch (e) { return; }
+	if (!Array.isArray(segs) || segs.length < 2) return;
+	let node = tree.tree();
+	const parent = segs.slice(0, -1);
+	for (let i = 0; i < parent.length; i++)
+		node = node && node.children && node.children[parent[i]];
+	if (!node || !node.children) return;
+	const names = Object.keys(node.children);
+	const here = segs[segs.length - 1];
+	const idle = window.requestIdleCallback || function (fn) { return window.setTimeout(fn, 300); };
+	idle(() => {
+		let n = 0;
+		for (let i = 0; i < names.length && n < 6; i++) {
+			if (names[i] === here) continue;
+			const child = node.children[names[i]];
+			if (!child || child.satisfied === false || !child.title) continue;
+			if (!tree.viewClassFor(child)) continue;
+			prefetchSegs(parent.concat([ names[i] ]));
+			n++;
+		}
+	});
+}
+
 /* Attempt an in-place navigation to `pathname`. Returns true if handled as a
  * SPA nav (caller should preventDefault), false to let the browser do a normal
  * full navigation. `push` adds a history entry (false when replaying popstate).
  * `kbd` — the navigation was activated from the keyboard (see the focus block). */
 function navigate(pathname, push, kbd) {
+	/* A click has not moved the URL yet, so refusing it is enough. A popstate has already
+	 * moved it; that handler undoes the move before it calls here, and must not ask twice. */
+	if (push && leaveBlocked()) return true;
+
 	const segs = tree.segsFromPath(pathname);
 	if (!segs) return false;
 
@@ -1040,8 +1122,8 @@ function navigate(pathname, push, kbd) {
 		const same = pathname === window.location.pathname;
 		/* a new entry gets a new id; re-navigating in place keeps the entry and its id (seed()
 		 * adopted one before wire() made this function reachable) */
-		if (!same) _curId = newEntryId();
-		history[same ? 'replaceState' : 'pushState']({ fsnav: true, fsid: _curId }, '', pathname);
+		if (!same) { _curId = newEntryId(); _seq++; }
+		history[same ? 'replaceState' : 'pushState']({ fsnav: true, fsid: _curId, fsseq: _seq }, '', pathname);
 	}
 
 	document.title = node.title ? (titleHost() + ' | ' + _(node.title)) : titleHost();
@@ -1123,6 +1205,7 @@ function navigate(pathname, push, kbd) {
 	let release;
 	_inflight = new Promise((r) => { release = r; });
 	progressStart();
+	prefetchSiblings(rsegs);
 
 	Promise.all([ warmedThen(className), previous.catch(() => {}) ]).then(() => {
 		/* superseded while waiting: never start the require. On a first visit the require IS the
@@ -1425,6 +1508,9 @@ function wireRouter() {
 	document.addEventListener('pointerdown', prefetchFrom, { passive: true });
 
 	window.addEventListener('popstate', () => {
+		/* history.go() back onto the page we refused. Ignore that popstate, or the second
+		 * activation of the leave guard would treat the undo as permission to leave. */
+		if (_leaveHold) { _leaveHold = false; return; }
 		/* an entry carrying a query belongs to a full load, this router only ever pushing bare
 		 * paths: replaying it as a bare-path SPA nav would drop the query the view expects */
 		if (window.location.search) {
@@ -1439,6 +1525,24 @@ function wireRouter() {
 		 * changed. */
 		if (window.location.pathname === _curPath)
 			return;
+
+		/* Before saveScroll/adoptEntry, so a refused Back does not retarget the scroll id.
+		 * Undo with go() so the history stack stays as it was; pushState would insert a
+		 * duplicate and the next Back would look like a fragment change. A higher fsseq is
+		 * Forward, which undoes with go(-1). */
+		if (leaveBlocked()) {
+			const incoming = history.state && typeof history.state.fsseq === 'number' ? history.state.fsseq : -1;
+			const undo = incoming > _seq ? -1 : 1;
+			_leaveHold = true;
+			_pendingRestore = null;
+			try { history.go(undo); }
+			catch (e) {
+				_leaveHold = false;
+				try { history.pushState({ fsnav: true, fsid: _curId, fsseq: _seq }, '', _curPath); }
+				catch (e2) {}
+			}
+			return;
+		}
 
 		/* the outgoing DOM is still up: record its offset under the entry we are leaving, then
 		 * adopt the entry we arrived on and look up what it recorded when it was left */
@@ -1527,6 +1631,8 @@ return baseclass.extend({
 	 * reaches them */
 	strayBodyNode,	/* fs:probe */
 	bodyLittered,	/* fs:probe */
+	fieldDirty,	/* fs:probe */
+	leaveBlocked,	/* fs:probe */
 	navigate,	/* fs:probe */
 	/* fs-search warms its recents and the arrow-key-highlighted result, neither of which the
 	 * pointer/focus triggers above can see. The edge points search -> router, because the router

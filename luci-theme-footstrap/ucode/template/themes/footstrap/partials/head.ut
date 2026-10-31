@@ -370,7 +370,7 @@
 
 		   One tag, no `media` pair: a media-qualified tag would win over this one for a viewer whose
 		   OS is dark but who chose light HERE, and the choice is the theme's to honour. #}
-		<meta name="theme-color" content="#f6f8fa">
+		<meta name="theme-color" content="#f7f4f1">
 		{# The sheet link below is emitted only when the TOKEN says the sheet exists — set the option
 		   after the file, never before. A preload is not in the stylesheet, so dropping the
 		   @font-face rules alone left the pair behind and every page went on asking the router for

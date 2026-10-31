@@ -587,9 +587,9 @@
 	.fs-indicators [data-indicator="uci-changes"][data-clickable],
 	#indicators [data-indicator="uci-changes"][data-clickable] {
 		background-color: var(--fs-panel2);
-		background-image: linear-gradient(var(--fs-warn-fill), var(--fs-warn-fill));
-		border-color: var(--fs-warn);
-		border-inline-start: 3px solid var(--fs-warn);
+		background-image: linear-gradient(color-mix(in srgb, var(--fs-orange) 18%, transparent), color-mix(in srgb, var(--fs-orange) 18%, transparent));
+		border-color: var(--fs-orange);
+		border-inline-start: 3px solid var(--fs-orange);
 		color: var(--fs-text);
 		font-weight: var(--fs-weight-bold);
 	}

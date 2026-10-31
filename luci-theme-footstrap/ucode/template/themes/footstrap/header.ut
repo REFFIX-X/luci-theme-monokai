@@ -96,6 +96,20 @@
 				if (!body || body.__fsBodyHooked) return;
 				body.__fsBodyHooked = true;
 				const adds = window.__fsBodyAdds || (window.__fsBodyAdds = []);
+				const note = (el) => {
+					if (el && el.nodeType === 1 && adds.indexOf(el) < 0) adds.push(el);
+				};
+				/* Diff <body>'s element children around one call. `invoke` is the original method
+				 * on its real receiver: body methods receive <body>, before/after receive the child. */
+				const record = (host, invoke) => {
+					const before = Array.prototype.slice.call(host.children);
+					const ret = invoke();
+					const after = host.children;
+					for (let i = 0; i < after.length; i++) {
+						if (before.indexOf(after[i]) === -1) note(after[i]);
+					}
+					return ret;
+				};
 				const names = [ 'appendChild', 'insertBefore', 'replaceChild', 'append', 'prepend',
 					'insertAdjacentElement', 'insertAdjacentHTML' ];
 				names.forEach((name) => {
@@ -106,18 +120,35 @@
 							configurable: true,
 							writable: true,
 							value() {
-								const before = Array.prototype.slice.call(this.children);
-								const ret = orig.apply(this, arguments);
-								const after = this.children;
-								for (let i = 0; i < after.length; i++) {
-									if (before.indexOf(after[i]) === -1) adds.push(after[i]);
-								}
-								return ret;
+								const self = this;
+								const args = arguments;
+								return record(self, () => orig.apply(self, args));
 							}
 						});
 					}
 					/* a host that refuses to redefine this one name leaves it unwrapped; the rest
 					 * still are */
+					catch (e) {}
+				});
+				/* before/after/replaceWith are called on a child, not on <body>, so the instance
+				 * wrap above never sees them. The page realm's Element.prototype is the only copy
+				 * those methods have; an extension's isolated world keeps its own and stays unrecorded. */
+				[ 'before', 'after', 'replaceWith' ].forEach((name) => {
+					const orig = Element.prototype[name];
+					if (typeof orig !== 'function') return;
+					try {
+						Object.defineProperty(Element.prototype, name, {
+							configurable: true,
+							writable: true,
+							value() {
+								const host = this.parentNode;
+								if (host !== body) return orig.apply(this, arguments);
+								const self = this;
+								const args = arguments;
+								return record(host, () => orig.apply(self, args));
+							}
+						});
+					}
 					catch (e) {}
 				});
 			})();

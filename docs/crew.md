@@ -29,8 +29,8 @@ diff or a question. A role that runs out is a card to split, not a number to rai
 `developer`'s because the lead's own edits skip T0 and the tester's diff; docs and config are the
 lead's because no gate reads them but `npm run check:fast`.
 
-The lead relays each role's return block to the maintainer in Russian: the block's fields and every
-command, path and number stay as printed, the prose around them is translated.
+The lead relays each role's return block to the maintainer in English: the block's fields and every
+command, path and number stay as printed.
 
 One `developer` at a time, sequentially: two writers on one card produce two designs for one
 problem, which is the failure every published account of parallel coding agents reports.

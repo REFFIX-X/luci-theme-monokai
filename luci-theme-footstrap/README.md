@@ -2,7 +2,7 @@
 
 REFFIX's Monokai Pro colour edition of the Footstrap-based LuCI theme for OpenWrt 25.12 and newer, using APK packages only.
 
-The theme keeps the existing layout, responsive shell, LuCI form styling, appearance controls and local assets while aligning the dark interface with the REFFIX Log Viewer.
+The theme keeps the existing layout, responsive shell, LuCI form styling, appearance controls and local assets. Dark mode uses the REFFIX Log Viewer hues. Light mode uses those hues darkened until text and fills clear WCAG AA.
 
 ## Colour system
 

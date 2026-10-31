@@ -38,7 +38,6 @@ Every page here stands on its own — start wherever your question is.
 | Page | Answers |
 |---|---|
 | [luci-app-styling-guide.md](luci-app-styling-guide.md) | How to style a `luci-app-*` so it works under any theme |
-| [luci-app-styling-guide_ru.md](luci-app-styling-guide_ru.md) | The same guide in Russian — the one page here that is mirrored |
 
 There is also a self-contained developer portal with the colour-token grid, the component markup
 and a style checker: <https://vizzletf.github.io/luci-theme-footstrap/>.

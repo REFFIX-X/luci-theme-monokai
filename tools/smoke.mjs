@@ -356,6 +356,30 @@ const recorderNotes = recorderMatch ? await page.evaluate((src) => {
 	check(!!iah && (window.__fsBodyAdds || []).includes(iah), 'insertAdjacentHTML(beforeend) is recorded');
 	if (iah) iah.remove();
 
+	/* before/after/replaceWith are invoked on a child, not on <body>, so the body-instance wrap
+	 * cannot see them. The prototype wrap records only when that child's parent is <body>. */
+	const anchor = document.createElement('div');
+	document.body.appendChild(anchor);
+	const sib = document.createElement('span');
+	anchor.before(sib);
+	check((window.__fsBodyAdds || []).includes(sib), 'before() on a body child is recorded');
+	const afterEl = document.createElement('em');
+	anchor.after(afterEl);
+	check((window.__fsBodyAdds || []).includes(afterEl), 'after() on a body child is recorded');
+	const replaced = document.createElement('i');
+	anchor.replaceWith(replaced);
+	check((window.__fsBodyAdds || []).includes(replaced), 'replaceWith() on a body child is recorded');
+	sib.remove();
+	afterEl.remove();
+	replaced.remove();
+
+	const nested = document.createElement('div');
+	const nestedChild = document.createElement('span');
+	nested.appendChild(nestedChild);
+	const outsider = document.createElement('b');
+	nestedChild.before(outsider);
+	check(!(window.__fsBodyAdds || []).includes(outsider), 'before() outside <body> is not recorded');
+
 	/* the wrap is on the <body> INSTANCE only — an append onto some other element must not be seen */
 	const other = document.createElement('div');
 	const child = document.createElement('span');

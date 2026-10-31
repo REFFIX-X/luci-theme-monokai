@@ -26,10 +26,18 @@
  * to the router's look, and the Save button sits disabled reading "Saved to router" over a page
  * painted in axes the router default does not carry. */
 let _lsBroken = false;
+/* Set while painting a storage event. An applier stores by calling lsSet; doing that from the
+ * event recreates a key the other tab just deleted and echoes a new value back. */
+let _paintOnly = false;
 function storageBroken() { return _lsBroken; }
 function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { _lsBroken = true; return null; } }
-function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) { _lsBroken = true; } }
-function lsDel(k) { try { localStorage.removeItem(k); } catch (e) { _lsBroken = true; } }
+function lsSet(k, v) { if (_paintOnly) return; try { localStorage.setItem(k, v); } catch (e) { _lsBroken = true; } }
+function lsDel(k) { if (_paintOnly) return; try { localStorage.removeItem(k); } catch (e) { _lsBroken = true; } }
+function paintFromStorage(fn) {
+	_paintOnly = true;
+	try { fn(); }
+	finally { _paintOnly = false; }
+}
 
 /* A stored JSON array, or [] — the shape the two remembered lists use (the search palette's recent
  * paths, the menu's open sections). lsGet owns the try/catch around localStorage; this one covers
@@ -290,9 +298,27 @@ function currentRail() {
 	return document.documentElement.getAttribute('data-rail') === 'true';
 }
 
+/* Another tab wrote localStorage. The event fires here only, after this document's copy is
+ * already updated, so current*() reads the new value. Paint only — see _paintOnly. A removed
+ * layout key falls back to the router default, not to top. Colour axes listen in fs-axes.js. */
+window.addEventListener('storage', (ev) => {
+	if (!ev.key || ev.key.indexOf('fs-') !== 0) return;
+	paintFromStorage(() => {
+		if (ev.key === 'fs-darkmode') applyMode(currentMode());
+		else if (ev.key === 'fs-layout') {
+			const s = ev.newValue;
+			const layout = (s === 'top' || s === 'sidebar') ? s : (sd('layout') === 'top' ? 'top' : 'sidebar');
+			applyLayout(layout);
+		}
+		else if (ev.key === 'fs-density') applyDensity(currentDensity());
+		else if (ev.key === 'fs-menu-autocollapse') applyAutoCollapse(currentAutoCollapse() ? 'on' : 'off');
+		else if (ev.key === 'fs-rail') applyRail(ev.newValue === 'true');
+	});
+});
+
 return baseclass.extend({
 	/* the storage wrappers and the router-default reader: fs-axes.js is built on these */
-	lsGet, lsSet, lsDel, lsGetArr, storageBroken, sd, setSD,
+	lsGet, lsSet, lsDel, lsGetArr, storageBroken, sd, setSD, paintFromStorage,
 	/* the two axis shapes, so the nineteen axes in fs-axes.js can be built from them */
 	listAxis, enumAxis,
 

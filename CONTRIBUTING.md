@@ -39,8 +39,8 @@ buildbot has no node — so a gate may need node, and the package never may.
 
 - **One concern per branch.** A layout fix and a packaging fix are two branches.
 - **Conventional Commits**, in English, present tense: `fix(chrome): …`, `feat(appearance): …`.
-- **A changelog entry in both files** — `CHANGELOG.md` and `CHANGELOG_ru.md`, same version, same
-  order. `npm run changelog` checks it.
+- **A changelog entry** in `CHANGELOG.md`, under `## [Unreleased]`, with a bold lead.
+  `npm run changelog` checks it. There is no Russian changelog mirror.
 - **Green gates.** CI re-runs everything plus the jobs that need a router; a red `check` locally
   will be red there.
 - **A comment that says why.** The codebase's comments carry the constraint, the alternative that
