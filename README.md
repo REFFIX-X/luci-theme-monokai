@@ -2,7 +2,7 @@
 
 A REFFIX-maintained Monokai Pro colour edition of the Footstrap-based OpenWrt LuCI theme, tuned to match the REFFIX Firewall Log dashboard.
 
-**Release:** [v2.1.0 for OpenWrt 25.12/APK](https://github.com/REFFIX-X/luci-theme-footstrap/releases/tag/v2.1.0)
+**Release:** [v2.1.0 for OpenWrt 25.12/APK](https://github.com/REFFIX-X/luci-theme-monokai/releases/tag/v2.1.0)
 
 ## Features
 
@@ -34,14 +34,14 @@ This release targets **OpenWrt 25.12 using APK**. The workflow builds the packag
 Run this over SSH as root on the router:
 
 ```sh
-uclient-fetch -qO- https://raw.githubusercontent.com/REFFIX-X/luci-theme-footstrap/main/install-online.sh | sh
+uclient-fetch -qO- https://raw.githubusercontent.com/REFFIX-X/luci-theme-monokai/main/install-online.sh | sh
 ```
 
 The installer checks that the router is OpenWrt 25.12/APK (a MediaTek Filogic snapshot is also accepted), downloads the latest release APK, verifies its SHA-256 checksum with `sha256sum` or `openssl`, and installs or upgrades `luci-theme-footstrap`. It installs the theme package only. Language catalogues are optional and are installed manually below. If the latest release URL cannot be fetched, it retries the v2.1.0 assets.
 
 ### Manual APK installation
 
-1. Open the [v2.1.0 release](https://github.com/REFFIX-X/luci-theme-footstrap/releases/tag/v2.1.0) and download `reffix-luci-theme-footstrap-openwrt-25.12.apk`, `SHA256SUMS-openwrt-25.12.txt`, and any `luci-i18n-footstrap-*.apk` you need.
+1. Open the [v2.1.0 release](https://github.com/REFFIX-X/luci-theme-monokai/releases/tag/v2.1.0) and download `reffix-luci-theme-footstrap-openwrt-25.12.apk`, `SHA256SUMS-openwrt-25.12.txt`, and any `luci-i18n-footstrap-*.apk` you need.
 2. Copy those files to the router. From Windows PowerShell, in the folder that contains the download:
 
    ```powershell

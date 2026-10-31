@@ -52,7 +52,7 @@ jobs:
 
   build-package:
     name: Build OpenWrt 25.12 APK
-    if: "github.event_name == 'push' && github.ref == 'refs/heads/main' && github.event.head_commit.message == 'release: v2.1.0'"
+    if: "github.event_name == 'push' && github.ref == 'refs/heads/main' && (github.event.head_commit.message == 'release: v2.1.0' || startsWith(github.event.head_commit.message, 'release: v2.1.0\\n'))"
     needs: validate
     runs-on: ubuntu-latest
     timeout-minutes: 45
@@ -107,7 +107,7 @@ jobs:
 
   publish-release:
     name: Publish v2.1.0
-    if: "github.event_name == 'push' && github.ref == 'refs/heads/main' && github.event.head_commit.message == 'release: v2.1.0'"
+    if: "github.event_name == 'push' && github.ref == 'refs/heads/main' && (github.event.head_commit.message == 'release: v2.1.0' || startsWith(github.event.head_commit.message, 'release: v2.1.0\\n'))"
     needs: [validate, build-package]
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -153,7 +153,7 @@ jobs:
           - `SHA256SUMS-openwrt-25.12.txt` contains SHA-256 checksums for all APKs.
 
           Install over SSH:
-          `uclient-fetch -qO- https://raw.githubusercontent.com/REFFIX-X/luci-theme-footstrap/main/install-online.sh | sh`
+          `uclient-fetch -qO- https://raw.githubusercontent.com/REFFIX-X/luci-theme-monokai/main/install-online.sh | sh`
 
           Then open LuCI → System → System → Language and Style and select Monokai Pro. A design that is already set is left unchanged.
 

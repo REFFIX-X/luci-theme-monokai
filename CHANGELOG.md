@@ -14,7 +14,7 @@
 - **The default light palette is Monokai Pro, darkened until each hue clears WCAG AA and the export ramp stays a ramp.** Light surfaces are warm paper (`#F7F4F1` / `#FFFCFA` / `#EFEAE6`) with the dark page colour `#2D2A2E` as ink. Accent `#147672`, good `#51741b`, warning `#85650c` and danger `#af435e` clear at least 4.55:1 on the lightest surface, and white ink on those fills is at least 5.43:1. The splash `theme-color` and the manifest use `#f7f4f1`.
 - **Orange and purple are used.** Pending configuration changes use orange (`#FC9867` in the dark, 6.63:1 on `#2D2A2E`). The active command-palette row uses purple (`#AB9DF2` in the dark, 5.96:1 on `#2D2A2E`). Other palettes fall back to warning and accent.
 - **Save and Apply stay at the bottom of the scroller on a long form.** The page-action bar is `position: sticky` with an opaque page background, so the row remains reachable while the map is scrolled. Print still hides the bar.
-- **The installer verifies the APK with `sha256sum` or `openssl`, and its fallback release is v2.1.0.** A router image without `sha256sum` used to stop before the download. The manual install steps now compare the checksum before `apk add`.
+- **The installer verifies the APK with `sha256sum` or `openssl`, and its fallback release is v2.1.0.** A router image without `sha256sum` used to stop before the download. The manual install steps now compare the checksum before `apk add`. Both `install.sh` and `install-online.sh` download from `REFFIX-X/luci-theme-monokai`.
 - **Repository text is English only.** The Russian README and the Russian styling guide are removed. There is no Russian changelog. LuCI language catalogues in `po/` are unchanged.
 
 ### Fixed
@@ -4782,6 +4782,6 @@ line, not one per tag. The individual patch releases are in the git history.
 [0.1.x]: https://github.com/VizzleTF/luci-theme-footstrap/commits/v0.1.1
 [2.0.0]: https://github.com/REFFIX-X/luci-theme-footstrap/compare/v0.14.14...v2.0.0
 [2.0.1]: https://github.com/REFFIX-X/luci-theme-footstrap/compare/v2.0.0...v2.0.1
-[Unreleased]: https://github.com/REFFIX-X/luci-theme-footstrap/compare/v2.1.0...HEAD
-[2.1.0]: https://github.com/REFFIX-X/luci-theme-footstrap/compare/v2.0.2...v2.1.0
+[Unreleased]: https://github.com/REFFIX-X/luci-theme-monokai/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/REFFIX-X/luci-theme-monokai/compare/v2.0.2...v2.1.0
 [2.0.2]: https://github.com/REFFIX-X/luci-theme-footstrap/compare/v2.0.1...v2.0.2
