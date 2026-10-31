@@ -52,7 +52,7 @@ jobs:
 
   build-package:
     name: Build OpenWrt 25.12 APK
-    if: "github.event_name == 'push' && github.ref == 'refs/heads/main' && (github.event.head_commit.message == 'release: v2.1.0' || startsWith(github.event.head_commit.message, 'release: v2.1.0\\n'))"
+    if: "github.event_name == 'push' && github.ref == 'refs/heads/main' && startsWith(github.event.head_commit.message, 'release: v2.1.0')"
     needs: validate
     runs-on: ubuntu-latest
     timeout-minutes: 45
@@ -107,7 +107,7 @@ jobs:
 
   publish-release:
     name: Publish v2.1.0
-    if: "github.event_name == 'push' && github.ref == 'refs/heads/main' && (github.event.head_commit.message == 'release: v2.1.0' || startsWith(github.event.head_commit.message, 'release: v2.1.0\\n'))"
+    if: "github.event_name == 'push' && github.ref == 'refs/heads/main' && startsWith(github.event.head_commit.message, 'release: v2.1.0')"
     needs: [validate, build-package]
     runs-on: ubuntu-latest
     timeout-minutes: 10
