@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+### Added
+
+- **The README opens on a hero of the Status overview.** The dark desktop screenshot, from the header through Port status, sits in a rounded window with the same white title, pink subtitle and magenta glow as the Log Viewer hero.
+
 ## [2.1.0] — 2026-10-31
 
 ### Added

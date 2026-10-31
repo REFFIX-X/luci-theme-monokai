@@ -1,3 +1,5 @@
+![luci-theme-monokai — Monokai Pro for OpenWrt LuCI](docs/img/readme-banner.png)
+
 # REFFIX Monokai Pro for LuCI
 
 A REFFIX-maintained Monokai Pro colour edition of the Footstrap-based OpenWrt LuCI theme, tuned to match the REFFIX Firewall Log dashboard.
