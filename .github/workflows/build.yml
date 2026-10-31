@@ -1,4 +1,4 @@
-name: REFFIX Monokai Pro v2.0.2
+name: REFFIX Monokai Pro v2.1.0
 
 on:
   push:
@@ -52,7 +52,7 @@ jobs:
 
   build-package:
     name: Build OpenWrt 25.12 APK
-    if: "github.event_name == 'push' && github.ref == 'refs/heads/main' && github.event.head_commit.message == 'release: v2.0.2'"
+    if: "github.event_name == 'push' && github.ref == 'refs/heads/main' && github.event.head_commit.message == 'release: v2.1.0'"
     needs: validate
     runs-on: ubuntu-latest
     timeout-minutes: 45
@@ -70,7 +70,7 @@ jobs:
       - name: Build with the OpenWrt SDK
         env:
           BUILD_DIR: ${{ runner.temp }}/reffix-footstrap-build
-          FOOTSTRAP_VERSION: "2.0.2"
+          FOOTSTRAP_VERSION: "2.1.0"
           OPENWRT_RELEASE: "25.12.5"
         run: sh luci-theme-footstrap/build-apk.sh
 
@@ -106,8 +106,8 @@ jobs:
           if-no-files-found: error
 
   publish-release:
-    name: Publish v2.0.2
-    if: "github.event_name == 'push' && github.ref == 'refs/heads/main' && github.event.head_commit.message == 'release: v2.0.2'"
+    name: Publish v2.1.0
+    if: "github.event_name == 'push' && github.ref == 'refs/heads/main' && github.event.head_commit.message == 'release: v2.1.0'"
     needs: [validate, build-package]
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -131,25 +131,31 @@ jobs:
           test -s dist/reffix-luci-theme-footstrap-openwrt-25.12.apk
           (cd dist && sha256sum -c SHA256SUMS-openwrt-25.12.txt)
 
-      - name: Publish v2.0.2
+      - name: Publish v2.1.0
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
-          TAG="v2.0.2"
+          TAG="v2.1.0"
           cat > "$RUNNER_TEMP/release-notes.md" <<'EOF'
-          # REFFIX Monokai Pro for LuCI v2.0.2
+          # REFFIX Monokai Pro for LuCI v2.1.0
 
           OpenWrt 25.12 APK package built with the official OpenWrt SDK. No custom package feed is required.
 
-          - Pending configuration changes are more visible in the theme, and apply countdowns are easier to read.
+          - In-place navigation asks before leaving a form with unsaved field edits. Save and Apply stay on screen.
+          - Light mode is Monokai Pro. Orange marks pending changes. Purple marks the active command-palette row.
+          - The command palette can switch theme, collapse the sidebar, and open pending changes.
+          - Appearance changes apply in other open tabs.
+          - The installer checks SHA-256 with `sha256sum` or `openssl` before `apk add`.
           - The existing package name `luci-theme-footstrap` is retained for in-place upgrades.
           - Separate translation APKs are attached when built.
           - `SHA256SUMS-openwrt-25.12.txt` contains SHA-256 checksums for all APKs.
 
           Install over SSH:
           `uclient-fetch -qO- https://raw.githubusercontent.com/REFFIX-X/luci-theme-footstrap/main/install-online.sh | sh`
+
+          Then open LuCI → System → System → Language and Style and select Monokai Pro. A design that is already set is left unchanged.
 
           Matching REFFIX Log Viewer: https://github.com/REFFIX-X/luci-app-log
           EOF
@@ -163,6 +169,6 @@ jobs:
 
           gh release create "$TAG" dist/* \
             --target "$GITHUB_SHA" \
-            --title "v2.0.2 - REFFIX Monokai Pro for LuCI" \
+            --title "v2.1.0 - REFFIX Monokai Pro for LuCI" \
             --notes-file "$RUNNER_TEMP/release-notes.md" \
             --repo "$GITHUB_REPOSITORY"

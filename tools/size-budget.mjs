@@ -25,9 +25,9 @@ const PIN = process.argv.includes('--pin');
 
 /* pinned by `--pin`; the numbers are the only thing in this block that changes */
 const LIMITS = {
-	cascadeCss: 130_000,
-	resourcesJs: 95_690,
-	coldJs: 62_280,
+	cascadeCss: 130_960,
+	resourcesJs: 99_450,
+	coldJs: 64_500,
 };
 
 function bytes(path) {

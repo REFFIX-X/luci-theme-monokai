@@ -3,7 +3,7 @@
 set -eu
 
 REPO="REFFIX-X/luci-theme-footstrap"
-FALLBACK_VERSION="v2.0.2"
+FALLBACK_VERSION="v2.1.0"
 PACKAGE="reffix-luci-theme-footstrap-openwrt-25.12.apk"
 SUMS="SHA256SUMS-openwrt-25.12.txt"
 TMP="/tmp/reffix-theme-install.$$"
