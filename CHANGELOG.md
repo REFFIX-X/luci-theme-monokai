@@ -2,7 +2,7 @@
 
 ### Added
 
-- **The README opens on a hero of the Status overview.** The dark desktop screenshot, from the header through Port status, sits in a rounded window with the same white title, pink subtitle and magenta glow as the Log Viewer hero.
+- **The README opens on a hero of the Status overview.** The dark Status screenshot sits in a rounded window with the same white title, pink subtitle and magenta glow as the Log Viewer hero. The WAN address and its gateway in that shot are replaced with documentation addresses from 192.0.2.0/24.
 
 ## [2.1.0] — 2026-10-31
 
