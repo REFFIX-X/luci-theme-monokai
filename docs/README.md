@@ -46,7 +46,7 @@ Every page here stands on its own — start wherever your question is.
 | `gallery.html` | every widget LuCI can emit, with the real class names — what the a11y gate runs against |
 | `devkit.src.html` | source of the developer portal |
 | `devkit.html` | built from `devkit.src.html`, `gallery.html` and `02-tokens.css` by the `pages` job. Generated, gitignored, never committed |
-| the playground | not a page here at all — recorded from a real router by `tools/playground/*` and CI's `playground` job, published as a release asset and fetched into Pages by `pages.yml`. [ci.md](ci.md) |
+| the playground | local recorder in `tools/playground/`; Pages does not publish it |
 | `screenshots/capture.py` | regenerates local reference shots; the PNGs are not committed |
 | `img/readme-banner.png` | the README hero |
 

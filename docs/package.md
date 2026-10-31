@@ -33,7 +33,7 @@ sh tools/check-packages.sh
 
 ## Install
 
-On OpenWrt 25.12/APK, `install.sh` downloads the release APK from GitHub, checks its SHA-256, then runs `apk add --allow-untrusted`. It also accepts a MediaTek Filogic snapshot. It rejects opkg and any other release line. The steps are in the repository README.
+On OpenWrt 25.12/APK, `install.sh` downloads the release APK from GitHub, checks its SHA-256, then runs `apk add --upgrade` on that file. A second run reads the installed `luci-theme-footstrap` version and replaces it. It also accepts a MediaTek Filogic snapshot. It rejects opkg and any other release line. The steps are in the repository README.
 
 ## Upstream and license
 

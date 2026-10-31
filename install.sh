@@ -82,8 +82,61 @@ ACTUAL="$(hash_file "$TMP/$PACKAGE")"
   exit 1
 }
 
-echo "Checksum verified. Installing/upgrading REFFIX Monokai Pro..."
-apk add --allow-untrusted "$TMP/$PACKAGE"
+# apk adbdump prints the package index lines. P: is the package name, V: is pkgver.
+# The download filename is not that name: the APK is reffix-luci-theme-footstrap-*.apk
+# and the installed package is luci-theme-footstrap.
+meta="$(apk adbdump "$TMP/$PACKAGE")" || {
+  echo "ERROR: could not read the package name and version from $PACKAGE." >&2
+  exit 1
+}
+pkg_name="$(printf '%s\n' "$meta" | awk '/^P:/ { print substr($0, 3); exit }')"
+pkg_ver="$(printf '%s\n' "$meta" | awk '/^V:/ { print substr($0, 3); exit }')"
+[ "$pkg_name" = "luci-theme-footstrap" ] && [ -n "$pkg_ver" ] || {
+  echo "ERROR: $PACKAGE is not luci-theme-footstrap (name=${pkg_name:-missing}, version=${pkg_ver:-missing})." >&2
+  exit 1
+}
+
+# `apk list --installed --manifest` prints "name version" for one installed package.
+# An absent package prints nothing. This is the older release the re-run has to replace.
+installed_ver() {
+  apk list --installed --manifest 2>/dev/null | awk '$1=="luci-theme-footstrap" { print $2; exit }'
+}
+
+before="$(installed_ver)"
+if [ -n "$before" ]; then
+  echo "Found installed luci-theme-footstrap $before."
+else
+  echo "luci-theme-footstrap is not installed."
+fi
+
+echo "Checksum verified. Installing luci-theme-footstrap $pkg_ver..."
+# A file argument pins that exact APK in /etc/apk/world, which is what replaces an
+# older install. `apk add` without --upgrade does not change a package that is already
+# installed (measured on apk 3: the old version stayed and the command exited 0).
+# --repositories-file /dev/null keeps the solver off the distfeeds, so a LuCI build
+# whose version sorts above 2.x is not chosen instead of this file.
+# stdin is /dev/null because this script is often run as `fetch | sh`, and apk must
+# not read the rest of the script. apk del is not used: postrm treats a real removal
+# as "switch Design back to Bootstrap and delete /etc/footstrap".
+if ! apk add --repositories-file /dev/null --allow-untrusted --upgrade "$TMP/$PACKAGE" </dev/null; then
+  echo "ERROR: apk could not install luci-theme-footstrap $pkg_ver." >&2
+  exit 1
+fi
+
+after="$(installed_ver)"
+if [ "$after" != "$pkg_ver" ]; then
+  echo "ERROR: luci-theme-footstrap is ${after:-not installed}; the verified package is $pkg_ver." >&2
+  echo "The package was not deleted. Design and /etc/footstrap were left as they were." >&2
+  exit 1
+fi
+
+if [ -z "$before" ]; then
+  echo "Installed luci-theme-footstrap $after."
+elif [ "$before" = "$after" ]; then
+  echo "Already current: luci-theme-footstrap $after."
+else
+  echo "Replaced luci-theme-footstrap $before with $after."
+fi
 echo "Done. Open LuCI → System → System → Language and Style, then select Monokai Pro."
 echo "A design that is already set is left as it is. Monokai Pro is selected only when LuCI has no Design set."
-echo "Existing package identity luci-theme-footstrap is retained for in-place upgrades."
+echo "Run this installer again to replace whatever luci-theme-footstrap is installed."

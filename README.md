@@ -39,7 +39,7 @@ Run this over SSH as root on the router:
 uclient-fetch -qO- https://raw.githubusercontent.com/REFFIX-X/luci-theme-monokai/main/install-online.sh | sh
 ```
 
-The installer checks that the router is OpenWrt 25.12/APK (a MediaTek Filogic snapshot is also accepted), downloads the latest release APK, verifies its SHA-256 checksum with `sha256sum` or `openssl`, and installs or upgrades `luci-theme-footstrap`. It installs the theme package only. Language catalogues are optional and are installed manually below. If the latest release URL cannot be fetched, it retries the v2.1.0 assets.
+The installer checks that the router is OpenWrt 25.12/APK (a MediaTek Filogic snapshot is also accepted), downloads the latest release APK, verifies its SHA-256 checksum with `sha256sum` or `openssl`, and installs `luci-theme-footstrap`. Run the same command again to update: it reads the version already installed and replaces that package with the verified APK, including a build whose version number sorts higher. The same version is left as it is. It installs the theme package only. Language catalogues are optional and are installed manually below. If the latest release URL cannot be fetched, it retries the v2.1.0 assets.
 
 ### Manual APK installation
 

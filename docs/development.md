@@ -744,8 +744,8 @@ happens on the maintainer's explicit word for one change, never by reflex, and `
 
 ### The playground: recording and replaying a real router
 
-`tools/playground/{capture,build,verify}.mjs` turn an owlab stand into a static, offline site —
-CI's own `playground` job, [ci.md](ci.md). Each step needs the one before it (`capture` needs a
+`tools/playground/{capture,build,verify}.mjs` turn an owlab stand into a static, offline site.
+Pages does not publish that recording. Each step needs the one before it (`capture` needs a
 booted, installed router; `build` and `verify` need `capture`'s output) and the whole chain is a
 router-driving Playwright run, so it is T2: detach it with `tools/bg.sh` and pair it with
 `tools/bg-wait.sh` in the same turn rather than waiting on it in the foreground.

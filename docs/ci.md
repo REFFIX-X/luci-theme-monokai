@@ -28,15 +28,15 @@ subject for a documentation commit.
 ## Pages
 
 `.github/workflows/pages.yml` publishes `docs/devkit.html` (generated, not committed) and
-`docs/gallery.html` with a freshly built `cascade.css`. It also tries to mirror a signed
-`manifest.txt` and a `playground.tar.gz` from the latest GitHub release, and continues without
-them when the release has neither. This repository's release workflow does not upload those files.
+`docs/gallery.html` with a freshly built `cascade.css`. It does not mirror a package feed and it
+does not fetch a playground recording.
 
 ## Installation
 
 `install.sh` and `install-online.sh` download `reffix-luci-theme-footstrap-openwrt-25.12.apk` from
 [REFFIX-X/luci-theme-monokai](https://github.com/REFFIX-X/luci-theme-monokai/releases), check its
-SHA-256 with `sha256sum` or `openssl`, then run `apk add --allow-untrusted`. There is no package
+SHA-256 with `sha256sum` or `openssl`, then `apk add --upgrade` that file over any
+`luci-theme-footstrap` already on the router. There is no package
 feed step and no IPK. The steps a router admin follows are in the
 [repository README](../README.md).
 
