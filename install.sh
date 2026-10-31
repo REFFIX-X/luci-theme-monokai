@@ -82,17 +82,46 @@ ACTUAL="$(hash_file "$TMP/$PACKAGE")"
   exit 1
 }
 
-# apk adbdump prints the package index lines. P: is the package name, V: is pkgver.
-# The download filename is not that name: the APK is reffix-luci-theme-footstrap-*.apk
-# and the installed package is luci-theme-footstrap.
+# apk-tools 3 `apk adbdump` writes YAML (serialize_yaml.c). The package identity is
+# info's own name and version, at two spaces. A path or a dependency also has
+# name/version, nested deeper or behind "- ", and those are not the package.
+# Older index text uses P: and V:. The download filename is not the package name:
+# the APK is reffix-luci-theme-footstrap-*.apk, the package is luci-theme-footstrap.
 meta="$(apk adbdump "$TMP/$PACKAGE")" || {
   echo "ERROR: could not read the package name and version from $PACKAGE." >&2
   exit 1
 }
-pkg_name="$(printf '%s\n' "$meta" | awk '/^P:/ { print substr($0, 3); exit }')"
-pkg_ver="$(printf '%s\n' "$meta" | awk '/^V:/ { print substr($0, 3); exit }')"
+parsed="$(printf '%s\n' "$meta" | awk '
+function unquote(s, n, q) {
+  gsub(/\r/, "", s)
+  sub(/^[ \t]+/, "", s)
+  sub(/[ \t]+$/, "", s)
+  n = length(s)
+  q = sprintf("%c", 39)
+  if (n >= 2 && substr(s, n, 1) == substr(s, 1, 1) &&
+      (substr(s, 1, 1) == "\"" || substr(s, 1, 1) == q))
+    s = substr(s, 2, n - 2)
+  return s
+}
+{
+  sub(/\r$/, "", $0)
+  if ($0 ~ /^P:/) { name = unquote(substr($0, 3)); next }
+  if ($0 ~ /^V:/) { ver = unquote(substr($0, 3)); next }
+  if ($0 ~ /^info:[ \t]*$/ || $0 ~ /^info:[ \t]*#/) { in_info = 1; next }
+  if (!in_info) next
+  if ($0 ~ /^[ \t]*$/ || $0 ~ /^[ \t]*#/) next
+  if ($0 !~ /^ /) { in_info = 0; next }
+  if (name == "" && $0 ~ /^  name:/) { name = unquote(substr($0, 8)); next }
+  if (ver == "" && $0 ~ /^  version:/) { ver = unquote(substr($0, 11)); next }
+}
+END { printf "%s\n%s\n", name, ver }
+')"
+pkg_name="$(printf '%s\n' "$parsed" | awk 'NR == 1 { print; exit }')"
+pkg_ver="$(printf '%s\n' "$parsed" | awk 'NR == 2 { print; exit }')"
 [ "$pkg_name" = "luci-theme-footstrap" ] && [ -n "$pkg_ver" ] || {
   echo "ERROR: $PACKAGE is not luci-theme-footstrap (name=${pkg_name:-missing}, version=${pkg_ver:-missing})." >&2
+  echo "apk adbdump (first 30 lines):" >&2
+  printf '%s\n' "$meta" | awk 'NR <= 30 { print }' >&2
   exit 1
 }
 
