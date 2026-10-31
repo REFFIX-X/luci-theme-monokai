@@ -12,7 +12,7 @@ The dark palette uses the same Monokai Pro-inspired colours as the REFFIX Firewa
 |---|---|
 | Page background | `#2D2A2E` |
 | Panels | `#221F22` |
-| Raised controls | `#343136` |
+| Raised controls | `#333035` |
 | Borders | `#514D52` |
 | Main text | `#FCFCFA` |
 | Yellow | `#FFD866` |
@@ -24,7 +24,7 @@ The dark palette uses the same Monokai Pro-inspired colours as the REFFIX Firewa
 
 ## Build and install
 
-The package remains named `luci-theme-footstrap` to preserve package-manager upgrade compatibility with existing Flint4 installations. The LuCI-visible theme and package metadata are branded **REFFIX Monokai Pro**.
+The package remains named `luci-theme-footstrap` so an existing install upgrades in place. LuCI shows the theme as **Monokai Pro**.
 
 The release workflow builds the package with the official OpenWrt SDK, using this directory's `Makefile`. The generated stylesheet is built from `styles/` by `build-css.sh`. Do not edit generated `htdocs/luci-static/footstrap/cascade.css`.
 

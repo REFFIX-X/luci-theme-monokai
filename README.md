@@ -31,39 +31,47 @@ This release targets **OpenWrt 25.12 using APK**. The workflow builds the packag
 
 ## Installation
 
-### One-line installation (OpenWrt 25.12/APK)
+OpenWrt 25.12 with APK. A MediaTek Filogic snapshot is accepted too. The package name stays `luci-theme-footstrap`. LuCI lists it as **Monokai Pro**.
 
-Run this over SSH as root on the router:
+### One-line install
+
+Run this over SSH as root:
 
 ```sh
 uclient-fetch -qO- https://raw.githubusercontent.com/REFFIX-X/luci-theme-monokai/main/install-online.sh | sh
 ```
 
-The installer checks that the router is OpenWrt 25.12/APK (a MediaTek Filogic snapshot is also accepted), downloads the latest release APK, verifies its SHA-256 checksum with `sha256sum` or `openssl`, and installs `luci-theme-footstrap`. Run the same command again to update: it reads the version already installed and replaces that package with the verified APK, including a build whose version number sorts higher. The same version is left as it is. It installs the theme package only. Language catalogues are optional and are installed manually below. If the latest release URL cannot be fetched, it retries the v2.1.0 assets.
+The script downloads the latest release APK, checks its SHA-256 with `sha256sum` or `openssl`, and installs it. If that download fails, it retries the [v2.1.0](https://github.com/REFFIX-X/luci-theme-monokai/releases/tag/v2.1.0) files.
 
-### Manual APK installation
+### Update
 
-1. Open the [v2.1.0 release](https://github.com/REFFIX-X/luci-theme-monokai/releases/tag/v2.1.0) and download `reffix-luci-theme-footstrap-openwrt-25.12.apk`, `SHA256SUMS-openwrt-25.12.txt`, and any `luci-i18n-footstrap-*.apk` you need.
-2. Copy those files to the router. From Windows PowerShell, in the folder that contains the download:
+Run the same command again. It reads the installed `luci-theme-footstrap` version and replaces that package with the verified APK. The same version is left as it is. A Design you already chose is not changed.
+
+### Choose the design
+
+Open LuCI at the router's address, for example `http://192.168.1.1`. Go to **System → System → Language and Style** and choose **Monokai Pro** under **Design**. The package selects Monokai Pro only when LuCI has no Design set. If the old stylesheet is still on screen, hard-refresh with **Ctrl+F5**.
+
+### Install by hand
+
+1. From the [v2.1.0 release](https://github.com/REFFIX-X/luci-theme-monokai/releases/tag/v2.1.0), download `reffix-luci-theme-footstrap-openwrt-25.12.apk` and `SHA256SUMS-openwrt-25.12.txt`. Language packages are optional: `luci-i18n-footstrap-es-0.apk` and `luci-i18n-footstrap-ru-0.apk`.
+2. Copy the files to the router. From Windows PowerShell, in the folder that contains the download, use the router's address in place of `192.168.1.1`:
 
    ```powershell
    scp .\reffix-luci-theme-footstrap-openwrt-25.12.apk .\SHA256SUMS-openwrt-25.12.txt root@192.168.1.1:/tmp/
    ```
 
-3. On the router, verify the checksum before installing. BusyBox `sha256sum -c` checks every name in the file, so run it against the one package you copied, or compare the hash by hand:
+3. On the router, compare the checksum, then install. BusyBox `sha256sum -c` checks every name in the file, so compare the one package you copied:
 
    ```sh
    cd /tmp
    sha256sum reffix-luci-theme-footstrap-openwrt-25.12.apk
    grep reffix-luci-theme-footstrap-openwrt-25.12.apk SHA256SUMS-openwrt-25.12.txt
-   apk add --allow-untrusted /tmp/reffix-luci-theme-footstrap-openwrt-25.12.apk
+   apk add --repositories-file /dev/null --allow-untrusted --upgrade /tmp/reffix-luci-theme-footstrap-openwrt-25.12.apk
    ```
 
-   The two hashes must match. `--allow-untrusted` is required because the APK is not signed by an OpenWrt build key; the checksum is the check. Install a language package the same way, after the same comparison, using its exact filename.
+   The two hashes must match before `apk add`. `--allow-untrusted` is required because the APK is not signed by an OpenWrt build key. `--upgrade` replaces a copy that is already installed. `--repositories-file /dev/null` stops the package manager from picking a different build of the same name from another feed.
 
-4. Open LuCI at `http://192.168.1.1` (use the router's address). Go to **System → System → Language and Style** and choose **Monokai Pro** under **Design**. The package registers that design and does not change a design that is already set. It selects Monokai Pro only when LuCI has no Design set at all. If the previous stylesheet is still on screen, hard-refresh with **Ctrl+F5**.
-
-**Upgrade note:** the package identifier remains `luci-theme-footstrap`, so `apk add` upgrades an existing install in place. An upgrade does not change the theme you already selected.
+   A language package uses the same comparison and the same `apk add` flags, with its exact filename.
 
 ## Palette (dark)
 

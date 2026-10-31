@@ -8,6 +8,7 @@
 
 - **Live install and report links point at this repository, and unused router screenshots are gone.** The Appearance link, the font and wallpaper scripts, issue templates, and the security policy use `REFFIX-X/luci-theme-monokai`. Eight unreferenced screenshots and one unused port-tile image are removed. The CI, packaging and installer notes describe the 25.12 APK checksum install. The Design key they name is `MonokaiPro`.
 - **Running the installer again replaces the luci-theme-footstrap already on the router.** It records the installed version, then `apk add --upgrade` of the verified APK with repository indexes turned off, so a LuCI feed build whose version sorts above 2.x is not kept. The package is not deleted: a real removal would switch Design back to Bootstrap and delete `/etc/footstrap`. The same version is reported as already current. Pages publishes the gallery and devkit, and does not fetch a manifest or a playground recording.
+- **The README install steps match that command.** Hand install compares the SHA-256, then runs `apk add --repositories-file /dev/null --allow-untrusted --upgrade`. The v2.1.0 language packages are named there. The dark surface swatch is `#333035`.
 
 ## [2.1.0] — 2026-10-31
 
