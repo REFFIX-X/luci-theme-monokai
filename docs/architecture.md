@@ -163,11 +163,11 @@ System the same way. It now owns a route of its own, `/admin/system/footstrap`
 dependency, not a page-watching module, because a theme with a route no longer needs the
 `body[data-page]` workaround for the page it owns.
 
-**There is no update checker, and nothing that loads one.** The installer adds the owfeed-packages
-feed, so `apk upgrade` / `opkg upgrade` carries the theme forward, and a settings page has no
-business reaching GitHub to reimplement that. `fs-version.js` reports the installed version with no
-request at all. Nothing globs for an optional file at render time either: the wallpaper pattern is an
-upload, so the server hands the client its cache-bust token like any other saved value.
+**There is no update checker, and nothing that loads one.** A settings page does not reach GitHub.
+`fs-version.js` reports the installed version with no request at all. A newer build is another APK
+from the release, installed with `apk`. Nothing globs for an optional file at render time either:
+the wallpaper pattern is an upload, so the server hands the client its cache-bust token like any
+other saved value.
 
 Renderer and shell in detail: [chrome.md](chrome.md).
 
@@ -179,11 +179,12 @@ config core 'main'
     option resourcebase '/luci-static/resources'
 
 config internal 'themes'
-    option Footstrap '/luci-static/footstrap'       # the list the dropdown is built from
+    option MonokaiPro '/luci-static/footstrap'      # the list the dropdown is built from
 ```
 
-**Exactly one entry.** Bootstrap registers a symlinked theme per mode (`BootstrapDark`, …);
-footstrap does not, because mode, palette and layout are client axes. Details:
+**Exactly one entry, named `MonokaiPro`.** `uci-defaults` deletes a leftover `luci.themes.Footstrap`
+key and does not add it back. Bootstrap registers a symlinked theme per mode (`BootstrapDark`, …);
+this theme does not, because mode, palette and layout are client axes. Details:
 [package.md](package.md).
 
 ## The runtime layout on the router

@@ -4,6 +4,10 @@
 
 - **The README opens on a hero of the Status overview.** The dark Status screenshot sits in a rounded window with the same white title, pink subtitle and magenta glow as the Log Viewer hero. The WAN address and its gateway in that shot are replaced with documentation addresses from 192.0.2.0/24.
 
+### Changed
+
+- **Live install and report links point at this repository, and unused router screenshots are gone.** The Appearance link, the font and wallpaper scripts, issue templates, and the security policy use `REFFIX-X/luci-theme-monokai`. Eight unreferenced screenshots and one unused port-tile image are removed. The CI, packaging and installer notes describe the 25.12 APK checksum install. The Design key they name is `MonokaiPro`.
+
 ## [2.1.0] — 2026-10-31
 
 ### Added

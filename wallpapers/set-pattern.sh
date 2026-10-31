@@ -1,7 +1,7 @@
 #!/bin/sh
 # Put one of this directory's drawings on a router as the footstrap Pattern wallpaper.
 #
-#   wget -qO- https://raw.githubusercontent.com/VizzleTF/luci-theme-footstrap/main/wallpapers/set-pattern.sh | sh -s cats
+#   wget -qO- https://raw.githubusercontent.com/REFFIX-X/luci-theme-monokai/main/wallpapers/set-pattern.sh | sh -s cats
 #   sh set-pattern.sh dinos --size 880 --strength 25
 #   sh set-pattern.sh https://example.org/my-tile.svg
 #   sh set-pattern.sh /tmp/my-tile.svg
@@ -16,7 +16,7 @@
 
 set -eu
 
-RAW="https://raw.githubusercontent.com/VizzleTF/luci-theme-footstrap/main/wallpapers/svg"
+RAW="https://raw.githubusercontent.com/REFFIX-X/luci-theme-monokai/main/wallpapers/svg"
 PAT_PATH="/etc/footstrap/pattern.svg"
 PAT_SERVE="/www/luci-static/footstrap/pattern.svg"
 PAT_MAX=524288					# 512 kB, the cap the upload page enforces

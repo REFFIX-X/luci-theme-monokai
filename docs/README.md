@@ -29,7 +29,7 @@ Every page here stands on its own — start wherever your question is.
 | Page | Answers |
 |---|---|
 | [package.md](package.md) | Source tree, Makefile, uci-defaults, postinst/postrm |
-| [ci.md](ci.md) | The CI job graph, packaging, installation and the trust chain |
+| [ci.md](ci.md) | What GitHub Actions runs, and how the 25.12 APK is installed |
 | [releasing.md](releasing.md) | The pre-release checklist, the changelog contract, the runbook |
 | [benchmark.md](benchmark.md) | The navigation benchmark: method and results |
 
@@ -39,9 +39,6 @@ Every page here stands on its own — start wherever your question is.
 |---|---|
 | [luci-app-styling-guide.md](luci-app-styling-guide.md) | How to style a `luci-app-*` so it works under any theme |
 
-There is also a self-contained developer portal with the colour-token grid, the component markup
-and a style checker: <https://vizzletf.github.io/luci-theme-footstrap/>.
-
 ## Not documentation
 
 | File | What it is |
@@ -50,7 +47,8 @@ and a style checker: <https://vizzletf.github.io/luci-theme-footstrap/>.
 | `devkit.src.html` | source of the developer portal |
 | `devkit.html` | built from `devkit.src.html`, `gallery.html` and `02-tokens.css` by the `pages` job. Generated, gitignored, never committed |
 | the playground | not a page here at all — recorded from a real router by `tools/playground/*` and CI's `playground` job, published as a release asset and fetched into Pages by `pages.yml`. [ci.md](ci.md) |
-| `screenshots/`, `img/` | reference mock-ups and README assets |
+| `screenshots/capture.py` | regenerates local reference shots; the PNGs are not committed |
+| `img/readme-banner.png` | the README hero |
 
 ## Conventions of these pages
 

@@ -1,13 +1,12 @@
 ---
 name: release
-description: Cut a footstrap release — the pre-tag matrix, the changelog rename, the tag, and publishing the feed. Use when asked to cut, tag or ship a release, or to check whether a release is ready.
+description: Cut a REFFIX Monokai Pro release — the checks, the changelog rename, and the main commit that publishes the 25.12 APK. Use when asked to cut or ship a release, or to check whether a release is ready.
 ---
 
 # Cutting a release
 
-`docs/releasing.md` is the authority and carries the per-issue table; this is the order and the
-things that are easy to skip. **The order is load-bearing** — the tag must point at a commit that
-already contains its own changelog entry.
+`docs/releasing.md` is the authority. **The order is load-bearing** — the commit that publishes
+already contains its own changelog entry. The workflow creates the tag from that commit.
 
 Nothing below is optional because a cheap gate went green. `npm run computed-diff` and
 `npm run smoke` are early detectors on a static gallery; they do not stand in for a userland.
@@ -38,10 +37,11 @@ them detached with `tools/bg.sh` and report the run-ids, then read the logs.
 | `/security-review` | on the final branch diff, **before** the tag |
 
 ```sh
-./tools/stage.sh && owfeed build
-owlab test --release 25.12.4 --install 'dist/noarch/luci-theme-footstrap-*.apk' --assert …
-owlab test --release 24.10.8 --install 'dist/all/luci-theme-footstrap_*.ipk'   --assert …
+npm run check
+node tools/jsmin-verify.mjs
 ```
+
+The published package is one OpenWrt 25.12 APK. There is no IPK leg. A local `./tools/stage.sh && owfeed build` is not the file GitHub publishes.
 
 `--install` is a host-side glob evaluated per router, so `dist/*/…` hands the apk box an ipk as well
 and the install fails on both (measured: `0 of 2 routers passed`). The five assertions and the exact
@@ -63,29 +63,23 @@ exactly one. Simulate it against the shape of the coming release — the loop is
 0. `node tools/size-budget.mjs --pin` — re-pins the size ceiling to this build plus 2 %. This is
    the ONLY time the numbers in `tools/size-budget.mjs` change; between releases a change that
    crosses them removes something instead. Goes into the same commit as the rename below.
-1. Rename `[Unreleased]` to `## [x.y.z] — YYYY-MM-DD` in **both** `CHANGELOG.md` and
-   `CHANGELOG_ru.md`, and add the `compare/` link at the bottom of each. Canonical section order,
-   every bullet with a bold lead.
-2. `npm run changelog` — green.
-3. Commit that change. Conventional Commits, English, **no AI attribution**.
-4. Tag `vx.y.z` on this commit. **Never tag first.**
-5. **Before pushing, read the recent runs on `main`**: `gh run list --limit 6` (on the maintainer's
-   Windows machine `gh` is not on `PATH` in Git Bash or WSL — call it by its full path,
-   `"/c/Program Files/GitHub CLI/gh.exe" run list --limit 6`). A run already red before your push is
-   still red after it, and `release` does not fire until whatever it currently gates on is green: a
-   tag pushed onto a broken pipeline cannot publish. A pre-existing failure needs an owner before you
-   tag — either an infrastructure condition to fix first, or a real regression that has nothing to
-   do with this release but will still hold it.
-6. Push the commit and the tag to `origin` — the only remote.
-7. **The release is not cut until the tag's own run is read, job by job** — not "wait for green".
-   `gh run view <id>` for the job list, `gh run view --job <id> --log-failed` for the failing
-   step's log; say whether a red job is the diff, infrastructure, or an upstream feed. Then check
-   the release carries the expected assets plus a `.sig` for each.
-8. **Publish the feed.** The theme installs from owfeed-packages, so a release nobody can
-   `apk upgrade` into is half a release. Bump `packages/luci-theme-footstrap/upstream.sh`, check the
-   sha256s in the diff against the assets you downloaded, merge, then read the **served** index
-   rather than the workflow log: `apk adbdump` on `releases/25.12/<arch>/packages.adb` and
-   `Packages.gz` on `releases/24.10/<arch>/`.
+1. Rename `[Unreleased]` to `## [x.y.z] — YYYY-MM-DD` in `CHANGELOG.md`, and add the `compare/`
+   link at the bottom. Leave `CHANGELOG_ru.md` empty. Canonical section order, every bullet with a
+   bold lead.
+2. In the same commit, set `.github/workflows/build.yml` so `build-package` and `publish-release`
+   match `release: vX.Y.Z`, and set `FOOTSTRAP_VERSION` to that version. The workflow creates the
+   tag. Do not create the tag by hand, and do not use a `release:` subject for any other commit.
+3. `npm run changelog` — green.
+4. Commit on `main`. Conventional Commits, English, **no AI attribution**. The subject starts with
+   `release: vX.Y.Z`.
+5. **Before pushing, read the recent runs on `main`**: `gh run list --limit 6`. A run already red
+   before your push is still red after it. `validate` runs on every push. The APK jobs run only
+   when the head commit message starts with the version string in the workflow.
+6. Push `main` to `origin`.
+7. **The release is not cut until that run is read, job by job** — `validate`, `build-package`,
+   `publish-release`. `gh run view <id>` for the job list, `gh run view --job <id> --log-failed`
+   for a failing step. The release assets are `reffix-luci-theme-footstrap-openwrt-25.12.apk` and
+   `SHA256SUMS-openwrt-25.12.txt`. There is no feed publish and no `.sig` asset.
 
-Steps 3, 4 and 6 need an explicit instruction from the maintainer, each time. `git commit` and
+The commit and the push need an explicit instruction from the maintainer, each time. `git commit` and
 `git push` are `ask` in `.claude/settings.json` for exactly this reason.

@@ -1,31 +1,18 @@
-# How the released packages are built — see https://github.com/owfeed/owfeed
+# Local staging for `owfeed build`. The GitHub release is not this file.
+# `.github/workflows/build.yml` builds the APK with the OpenWrt SDK
+# (`luci-theme-footstrap/build-apk.sh`) and publishes that file.
 #
 #   ./tools/stage.sh     # produce dist/root, the tree owfeed packages
-#   owfeed build         # dist/noarch/*.apk (OpenWrt 25.12 only)
+#   owfeed build         # dist/noarch/*.apk (local only, OpenWrt 25.12)
 #
-# Why this replaced the SDK: the theme is noarch — CSS, templates and browser JS, not one compiled
-# byte — and the package needs only OpenWrt 25.12's APK container. What the SDK
-# contributed was three things owfeed also does: the .lmo catalogues (byte-identical to po2lmo), the
-# conffiles/scripts sidecars package-pack.mk emits, and the default_postinst wrapper that makes
-# /etc/uci-defaults/* run at all.
-#
-# The SDK verification did not go away with it: owfeed fetches the host `apk` out of a release SDK
-# and holds it to the same ed25519 signature over sha256sums, with the key pinned from another host.
-#
-# luci-theme-footstrap/Makefile stays, and is not a second source of truth: tools/stage.sh reads the
-# lifecycle scripts out of it, and CI keeps the gates that protect an SDK build (scan-marker, jsmin
-# equivalence). Anyone can still build this theme in an OpenWrt SDK; nothing we release comes from
-# one.
+# luci-theme-footstrap/Makefile stays. tools/stage.sh reads the lifecycle scripts out of it.
 
 version: 1
 
 feed:
   name: footstrap
-  # This repository publishes RELEASE ASSETS, not a feed of its own: an installed key is a trust
-  # anchor for every package name, which is more authority than one theme should ask for. The feed
-  # that carries this package is owfeed-packages, which pins our released .apk by sha256 and adds its
-  # own signature — so this URL is where a subscriber's apk really fetches it from, and `build` is
-  # the only stage this file drives.
+  # Schema field for a local `owfeed build`. install.sh does not add this URL on the router.
+  # The published install downloads the GitHub release APK and checks its SHA-256.
   url: https://repo.owfeed.org
   title: REFFIX Monokai Pro
   maintainer: "REFFIX"
@@ -38,19 +25,10 @@ releases:
     default: true
     format: apk
 
-# NO `signing:` BLOCK, and its absence is the point. Those keys sign a feed's INDEX, and this
-# repository never builds one: it publishes release assets, and the feed that
-# carries them signs its index with its own key at the far end. What vouches for our bytes is
-# `owfeed release`, whose usign signatures over the packages and the manifest are made in the release
-# job, where the secret is reachable and the build job cannot see it.
-#
-# If a feed is ever published from here: FOOTSTRAP_USIGN_KEY is the BASE64 of usign's two-line
-# secret-key file (one canonical form, so a copy-paste cannot mangle the newlines) and owfeed wants
-# the file itself, so decode it into place.
+# No `signing:` block. The published APK is checked with SHA256SUMS-openwrt-25.12.txt before
+# `apk add --allow-untrusted`. It is not signed by an OpenWrt build key.
 
-# Required by the schema and unused here: `publish` hands a built feed to a host, and this repository
-# stops after `build`. Named github-pages because that is where the Pages workflow already serves the
-# release mirror from, and Pages allows a single artifact per site.
+# Schema field. `publish` is not the GitHub release job.
 publish:
   - target: github-pages
 

@@ -1,14 +1,15 @@
 # CLAUDE.md
 
-`luci-theme-footstrap` — a LuCI theme for **OpenWrt 24.10 and newer** (and ImmortalWrt). Standalone:
+`luci-theme-footstrap` — a LuCI theme published for **OpenWrt 25.12/APK**. Standalone:
 it ships no framework and depends on nothing but `luci-base`. Page content is rendered client-side
 by app view-JS, so the theme is server chrome (`ucode/template/themes/footstrap/*.ut`) + one
 generated `cascade.css` + `fs-*.js` in `htdocs/luci-static/resources/`.
 
 **Communicate in English.** Code, comments, commit messages and PR text stay in English.
 
-**The floor is 24.10.** 23.05 support ended at 0.14.2 (`ui.RangeSlider` is 24.10-only,
-openwrt/luci#8978); `install.sh` serves a 23.05 router that pin. `docs/releasing.md`.
+**The published line is OpenWrt 25.12/APK.** `install.sh` accepts 25.12 and a MediaTek Filogic
+snapshot. It does not install an IPK. The theme's LuCI calls assume 24.10 or newer
+(`ui.RangeSlider`, openwrt/luci#8978). `docs/releasing.md`.
 
 `styles/base/` is footstrap's code: **do not call it "the fork" or reintroduce the word bootstrap**
 into filenames, comments or docs. That name belongs to the *other, real* package only — the
@@ -38,11 +39,11 @@ repository, and loads none of this file. `.claude/hooks/session-start.sh` says s
 | client navigation | `docs/spa-router.md` |
 | foreign `luci-app-*`, the fence | `docs/third-party-apps.md` |
 | Makefile, uci-defaults, postinst/postrm, ACL | `docs/package.md` |
-| CI job graph, owfeed, packaging, the trust chain | `docs/ci.md` |
+| CI, the 25.12 APK build, installation | `docs/ci.md` |
 | pre-release checklist, changelog contract, runbook | `docs/releasing.md` |
 | the navigation benchmark | `docs/benchmark.md` |
 
-`docs/luci-app-styling-guide.md` (+ `_ru`) is outward-facing. `docs/gallery.html` renders every
+`docs/luci-app-styling-guide.md` is outward-facing. `docs/gallery.html` renders every
 widget LuCI or any app can emit — it is what `a11y`, `export-tier`, `computed-diff` and `smoke`
 measure, and how the theme is checked without a router.
 

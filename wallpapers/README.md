@@ -7,7 +7,7 @@ reaches the network at run time. Save one and upload it from that page like any 
 this on the router, as root:
 
 ```sh
-wget -qO- https://raw.githubusercontent.com/VizzleTF/luci-theme-footstrap/main/wallpapers/set-pattern.sh | sh -s cats
+wget -qO- https://raw.githubusercontent.com/REFFIX-X/luci-theme-monokai/main/wallpapers/set-pattern.sh | sh -s cats
 ```
 
 `cats` or `dinos`, and the cats are back where they used to be. Details below.

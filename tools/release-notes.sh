@@ -107,19 +107,14 @@ $summary_ru
 EOF
 fi
 
-# THE RELEASE ASSET, not raw.githubusercontent.com/main. Two reasons, both already written down
-# elsewhere and both undone by pointing at the branch: stage-release.sh attaches and signs
-# install.sh precisely because raw.githubusercontent is rate-limited for unauthenticated callers —
-# so the user whose IP has run out of budget cannot fetch the installer meant to rescue them (issue
-# #17) — and a release page that links `main` hands a reader of an OLD release whatever the branch
-# says today, which is not the script that release was tested with.
+# Same one-liner as the repository README. This release line is OpenWrt 25.12/APK.
 cat <<EOF
 
 <details><summary>Install</summary>
 
-One-liner (auto-detects apk/ipk):
+One-liner (OpenWrt 25.12/APK):
 \`\`\`sh
-wget -qO- https://github.com/VizzleTF/luci-theme-footstrap/releases/latest/download/install.sh | sh
+uclient-fetch -qO- https://raw.githubusercontent.com/REFFIX-X/luci-theme-monokai/main/install-online.sh | sh
 \`\`\`
 </details>
 EOF

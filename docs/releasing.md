@@ -2,34 +2,31 @@
 
 ## Supported package line
 
-The theme is built for OpenWrt **25.12 and newer** using APK only. The package is architecture-independent and its files are emitted under `dist/noarch/`. No IPK/opkg package is generated or published.
+The theme is built for OpenWrt **25.12** using APK only. The package is architecture-independent. The release workflow writes `dist/reffix-luci-theme-footstrap-openwrt-25.12.apk` and `SHA256SUMS-openwrt-25.12.txt`. No IPK/opkg package is published.
 
 ## Before a release
 
-Run the checks on the branch you intend to release:
+Run the same checks the `validate` job runs:
 
 ```sh
 npm ci
 npm run check:fast
 npm run check:mid
 npm run check:slow
-./tools/stage.sh
-owfeed plan
-owfeed check
-owfeed build
-sh tools/check-packages.sh
-owlab test --release 25.12.4 --install 'dist/noarch/luci-theme-footstrap-*.apk' --assert …
+node tools/jsmin-verify.mjs
 ```
-
-The package checker opens the actual APK payloads, verifies the theme and translation packages, and fails if it sees any IPK. The router test installs the built APK and checks the LuCI pages and templates on OpenWrt 25.12.
 
 ## Release pipeline
 
-The GitHub Actions workflow validates the source, builds the APK, installs it on a real OpenWrt 25.12 test router, runs the live browser checks, and verifies the tagged release before publication. A tag is not a substitute for a green run: inspect the workflow's failed step and package artifacts before treating the release as available.
+`.github/workflows/build.yml` publishes only when a push to `main` has a head commit message that
+starts with `release: v2.1.0`. That string is in the workflow file. `validate` runs the source
+gates. `build-package` builds the APK with the OpenWrt SDK. `publish-release` checks
+`SHA256SUMS-openwrt-25.12.txt` and creates the GitHub release. It does not install the package on
+a router, and it refuses to overwrite an existing `v2.1.0` tag or release.
 
-The release package keeps the established identifier `luci-theme-footstrap` for upgrade compatibility. LuCI presents it as **Monokai Pro** and the About/version link identifies REFFIX.
+A documentation commit must not use a subject that starts with `release:`.
 
-The publishing workflow is triggered by a commit on `main` whose subject is exactly `release: vX.Y.Z`. It builds and validates the APKs before creating that version's GitHub release. Existing tags are never overwritten, and prior releases remain available.
+The release package keeps the established identifier `luci-theme-footstrap` for upgrade compatibility. LuCI presents it as **Monokai Pro** and the Appearance link identifies REFFIX.
 
 ## Package contents
 

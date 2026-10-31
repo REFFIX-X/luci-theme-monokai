@@ -36,10 +36,12 @@ is not yours, weeks later. Four of them are now held by `npm run makefile-contra
 - The Makefile's buildroot signature line is what `include/scan.mk` greps for to see the package at
   all. It must stay last, with nothing between it and the text it announces (`npm run marker`); it
   has been deleted as boilerplate once.
-- **The trust chain fails closed**: a verified TLS channel (never `-k`, never as a retry), an
-  ed25519 `usign` signature, then GitHub's sha256. The signature is the link that holds — GitHub
-  *computes* the asset digest, so a swapped asset passes the checksum. A missing digest, `.sig` or
-  usign is a refusal, not a downgrade.
+- **The installer fails closed on the check it actually runs**: TLS download (`uclient-fetch` or
+  `wget`, never `-k`), then SHA-256 of `reffix-luci-theme-footstrap-openwrt-25.12.apk` against
+  `SHA256SUMS-openwrt-25.12.txt`, and only then `apk add --allow-untrusted`. A missing or mismatched
+  checksum is a refusal. The APK is not signed by an OpenWrt build key. `build-apk.sh` still
+  verifies the OpenWrt SDK tarball with the pinned keyring key; that check is the toolchain, not
+  the theme package.
 
 After an edit here, T0 is the one gate that covers the file: `npm run makefile-contract` and
 `npm run marker` for the Makefile (they read different lines — run both), `npm run conffiles` for

@@ -4,7 +4,7 @@
 
 The theme is built and published for **OpenWrt 25.12 and newer using APK only**. IPK/opkg packages are no longer generated or published.
 
-The package is architecture-independent. The theme payload is built by the shared owfeed pipeline from `owfeed.yml` and `tools/stage.sh`.
+The package is architecture-independent. The GitHub release builds it with the OpenWrt SDK (`luci-theme-footstrap/build-apk.sh`). `tools/stage.sh` and `owfeed.yml` are a local staging path; they are not the release job.
 
 ## Package names
 
@@ -15,7 +15,7 @@ The installed package identifier remains `luci-theme-footstrap` for upgrade comp
 
 ## Build and validation
 
-The main CI workflow runs the static gates, stages the package, builds APK files with owfeed, opens each APK to verify its payload, installs the package on OpenWrt 25.12, and checks the rendered LuCI pages.
+On every push and pull request, CI runs the static, CSS and browser gates. The APK build and GitHub release run only for a push to `main` whose message starts with `release: v2.1.0`, which is the version string in `.github/workflows/build.yml`. That job does not install the package on a router.
 
 Local build outline:
 
@@ -29,11 +29,11 @@ owfeed build
 sh tools/check-packages.sh
 ```
 
-Artifacts are emitted under `dist/noarch/`. The package-checking script verifies the theme and each translation package and fails if an IPK is present.
+`owfeed build` writes under `dist/noarch/`. The release workflow writes `dist/reffix-luci-theme-footstrap-openwrt-25.12.apk` instead. `tools/check-packages.sh` verifies a staged theme package and fails if an IPK is present.
 
 ## Install
 
-On a supported OpenWrt 25.12+ system with APK, use the configured package feed or the signed installer asset attached to the release. The installer rejects systems that do not have APK or whose OpenWrt release does not match the supported release line.
+On OpenWrt 25.12/APK, `install.sh` downloads the release APK from GitHub, checks its SHA-256, then runs `apk add --allow-untrusted`. It also accepts a MediaTek Filogic snapshot. It rejects opkg and any other release line. The steps are in the repository README.
 
 ## Upstream and license
 

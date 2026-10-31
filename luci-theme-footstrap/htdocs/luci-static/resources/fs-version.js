@@ -23,6 +23,6 @@ function isReal() { return ((/^\d+\.\d+/).test(FS_VERSION)) && !((/-dev$/).test(
 /* Do not re-add `VERSION` or `isReal` as exports: neither had a caller, and an export nobody
  * imports is a promise to keep the shape stable. */
 return baseclass.extend({
-	REPO_URL: 'https://github.com/REFFIX-X/luci-theme-footstrap',
+	REPO_URL: 'https://github.com/REFFIX-X/luci-theme-monokai',
 	label: () => (isReal() ? ('REFFIX Monokai Pro v' + FS_VERSION) : 'REFFIX Monokai Pro (dev)')
 });

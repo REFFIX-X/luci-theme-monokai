@@ -10,7 +10,7 @@ This directory holds the script that puts a font back, if you want one. Run it o
 root:
 
 ```sh
-wget -qO- https://raw.githubusercontent.com/VizzleTF/luci-theme-footstrap/main/fonts/set-font.sh | sh -s -- --sans Inter
+wget -qO- https://raw.githubusercontent.com/REFFIX-X/luci-theme-monokai/main/fonts/set-font.sh | sh -s -- --sans Inter
 ```
 
 Nothing here is bundled with the theme and **no font is named or hosted in this repository** — a

@@ -2,11 +2,10 @@
 
 ## Reporting a vulnerability
 
-Report privately through GitHub — **Security → [Report a vulnerability](https://github.com/VizzleTF/luci-theme-footstrap/security/advisories/new)**.
-If that is unavailable to you, email <vizzlef@gmail.com> with `luci-theme-footstrap` in the
-subject. Please do not open a public issue for a suspected vulnerability.
+Report privately through GitHub — **Security → [Report a vulnerability](https://github.com/REFFIX-X/luci-theme-monokai/security/advisories/new)**.
+Please do not open a public issue for a suspected vulnerability.
 
-Include what you have: the OpenWrt release and package manager (25.12/apk or 24.10/opkg), the theme
+Include what you have: the OpenWrt release (25.12/APK), the theme
 version from *System → System → Appearance*, the request or the page, and what an attacker gains.
 A proof of concept is welcome but not required.
 
@@ -19,7 +18,6 @@ ships in the next release; you will be credited in `CHANGELOG.md` unless you ask
 |---|---|
 | latest release | yes |
 | earlier releases | no — upgrade first, then report if it persists |
-| 0.14.2 (the last for OpenWrt 23.05) | no. 23.05 is end-of-life upstream |
 
 ## What this package can actually do
 
@@ -37,8 +35,8 @@ dispatcher node and depends on `luci-base` alone. The parts worth your attention
   under `/etc/footstrap`, reached from `/www` through a symlink.
 - **The browser JS.** HTML is parsed from a string in four places, all literal; the
   `fs/no-unsanitized-html` lint rule keeps it that way.
-- **The installer**, `install.sh`, verifies a usign signature and a checksum before it installs
-  anything, and pins 23.05 routers to 0.14.2.
+- **The installer**, `install.sh`, checks the APK's SHA-256 before `apk add`. This release is
+  OpenWrt 25.12/APK only.
 
 Out of scope: anything requiring an existing root shell on the router (writing
 `/etc/config/footstrap` by hand is a root action, and the template sanitises it anyway), and the
@@ -47,4 +45,4 @@ behaviour of third-party `luci-app-*` packages the theme merely styles.
 ## What we do on our side
 
 Every release and every upstream pull request goes through a security review of the branch diff
-before the tag is cut, and CI installs each build on a real 25.12 and a real 24.10 userland.
+before the tag is cut, and the release workflow builds the OpenWrt 25.12 APK.

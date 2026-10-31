@@ -326,12 +326,10 @@ apk never exports it.
 user including the admin who just clicked Update. `reload` re-reads `acl.d/*`, which is all this
 package needs.
 
-**One asset per package per format in a release.** Nothing on a router picks an asset any more —
-the installer takes the feed — but a reader that does gets one candidate, not a guess: GitHub
-returns assets **sorted by name**, and a `luci-i18n-…` package sorting ahead of `luci-theme-…` once
-picked the wrong asset silently (issue #6). Code already on somebody's router cannot be fixed
-remotely; only the release can. CI fails unless each package resolves to exactly one asset under its
-name-anchored regex.
+**One named APK.** `install.sh` downloads `reffix-luci-theme-footstrap-openwrt-25.12.apk` and
+`SHA256SUMS-openwrt-25.12.txt`, then matches the checksum by that filename. GitHub lists release
+assets sorted by name; a reader that takes the first `luci-*` asset can pick a catalogue instead of
+the theme (issue #6). The installer does not.
 
 **The translation catalogue lives in `po/`.** That is the directory `LUCI_LANGUAGES` globs, so
 luci.mk bakes a `luci-i18n-footstrap-<lang>` package per language exactly as it does for every
@@ -339,25 +337,19 @@ luci-app — and it is the only directory Weblate, which CONTRIBUTING names as t
 LuCI, can see.
 
 **No runtime dependency beyond `+luci-base`.** `curl` is not in OpenWrt's default set (the base
-image ships `uclient-fetch`); fall back, do not depend. `jsonfilter`, `sha256sum` and `usign` are
-in the base image.
+image ships `uclient-fetch`); fall back, do not depend. The installer needs `sha256sum` or `openssl`.
 
 ## The trust chain
 
-`install.sh` installs from the owfeed-packages feed, so **the package manager is what verifies the
-bytes**: apk checks the index against `owfeed-packages.pem`, opkg against usign key
-`9040356b214084da`, and both keys are pinned in the script itself — it runs from `wget | sh` before
-any package of ours exists. The script's own fetch of those keys uses a verified TLS channel:
-never `-k` / `--no-check-certificate`, and never as a retry, because a failed verification *is* the
-MITM case.
+`install.sh` and `install-online.sh` download the release APK over TLS (`uclient-fetch` or `wget`,
+never `-k` / `--no-check-certificate`). They compare its SHA-256 with the line for that filename in
+`SHA256SUMS-openwrt-25.12.txt` before `apk add --allow-untrusted`. There is no package feed and no
+IPK.
 
-The installer no longer downloads release assets, so it carries no sha256, no `usign -V` and no
-`--allow-untrusted`. **The release still signs everything** — a `manifest.txt` plus a detached
-`.sig` per asset, both verified in the `release` job — because that is what a by-hand install and
-a mirror have to be checked against.
-
-An ed25519 signature is the link that holds and a sha256 alone cannot: GitHub *computes* the asset
-digest from the uploaded bytes, so whoever can swap an asset gets the digest recomputed for them.
+`--allow-untrusted` means the APK is not signed by an OpenWrt build key. The checksum file is a
+release asset beside the APK, so it is the check this installer actually performs. The OpenWrt SDK
+tarball used by `luci-theme-footstrap/build-apk.sh` is a different input: that script verifies
+OpenWrt's signed `sha256sums` with the pinned keyring key before it unpacks the toolchain.
 
 ## Changelog and release
 

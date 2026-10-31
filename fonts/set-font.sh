@@ -1,7 +1,7 @@
 #!/bin/sh
 # Give a router's footstrap theme a font of your choosing.
 #
-#   wget -qO- https://raw.githubusercontent.com/VizzleTF/luci-theme-footstrap/main/fonts/set-font.sh | sh -s -- --sans Inter
+#   wget -qO- https://raw.githubusercontent.com/REFFIX-X/luci-theme-monokai/main/fonts/set-font.sh | sh -s -- --sans Inter
 #   sh set-font.sh --sans Inter --sans-file https://example.org/Inter.woff2 --sans-weight '100 900'
 #   sh set-font.sh --mono 'Fira Code' --mono-file /tmp/FiraCode-Regular.woff2
 #   sh set-font.sh remove
